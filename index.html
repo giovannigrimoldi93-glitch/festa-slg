@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bar San Luigi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <button data-page="home" class="active">Home</button>
+  <button data-page="settings">Impostazioni</button>
+  <button data-page="history">Storico</button>
+</nav>
+
+<!-- =================== HOME =================== -->
+<div id="home" class="page active">
+  <h1>Prodotti</h1>
+  <div id="productsContainer"></div>
+
+  <h2>Carrello</h2>
+  <table>
+    <thead><tr><th>Prodotto</th><th>Qtà</th><th>Prezzo</th><th>Rimuovi</th></tr></thead>
+    <tbody id="cartBody"></tbody>
+    <tfoot><tr><td colspan="2">Totale</td><td id="totalPrice">0.00</td><td></td></tr></tfoot>
+  </table>
+  <button id="printAndSend">Invia Ordine</button>
+</div>
+
+<!-- =================== SETTINGS =================== -->
+<div id="settings" class="page">
+  <h1>Gestione Categorie</h1>
+  <input type="text" id="catName" placeholder="Nome categoria">
+  <input type="color" id="catColor" value="#333333">
+  <button id="addCategoryBtn">Aggiungi Categoria</button>
+  <ul id="categoriesList"></ul>
+
+  <h1>Gestione Prodotti</h1>
+  <select id="prodCat"></select>
+  <input type="text" id="prodName" placeholder="Nome prodotto">
+  <input type="number" id="prodPrice" placeholder="Prezzo">
+  <input type="checkbox" id="prodEnabled" checked> Abilitato
+  <button id="addProductBtn">Aggiungi Prodotto</button>
+  <ul id="productsList"></ul>
+</div>
+
+<!-- =================== HISTORY =================== -->
+<div id="history" class="page">
+  <h1>Storico Ordini</h1>
+  <input type="date" id="historyDate">
+  <button id="loadHistory">Carica</button>
+  <table id="historyTable">
+    <thead><tr><th>Prodotto</th><th>Qtà</th></tr></thead>
+    <tbody></tbody>
+    <tfoot><tr><td>Totale</td><td id="historyTotal">0.00</td></tr></tfoot>
+  </table>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,28 +1,22 @@
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-body { margin:0; background:#f4f4f9; color:#333; }
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+body { margin:0; background:#f0f2f5; color:#333; }
 header { background:#4a90e2; color:white; padding:1rem; text-align:center; }
-header nav { margin-top: 0.5rem; }
-header nav button {
-  background: white;
-  color:#4a90e2;
-  border:none;
-  padding:0.5rem 1rem;
-  margin:0 0.2rem;
-  border-radius:5px;
-  cursor:pointer;
-}
-header nav button:hover { opacity:0.8; }
-main { padding:2rem; display:flex; justify-content:center; }
-.screen { width:100%; max-width:600px; }
-.hidden { display:none; }
-form { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; }
-input, select, button { padding:0.5rem; border-radius:5px; border:1px solid #ccc; }
-button { background:#4a90e2; color:white; cursor:pointer; border:none; transition:0.3s; }
-button:hover { background:#357abd; }
-ul { list-style:none; padding:0; }
-li { background:#f9f9f9; margin-bottom:0.5rem; padding:0.5rem; border-radius:5px; display:flex; justify-content:space-between; align-items:center; }
-.actions button { margin-left:0.3rem; padding:0.3rem 0.5rem; border:none; border-radius:5px; cursor:pointer; }
-.actions button.edit { background:#f39c12; color:white; }
-.actions button.delete { background:#e74c3c; color:white; }
-.actions button:hover { opacity:0.8; }
-span.color { width:16px; height:16px; display:inline-block; border-radius:50%; margin-left:0.3rem; }
+nav { margin-top:0.5rem; }
+.nav-btn { background:white; color:#4a90e2; border:none; padding:0.5rem 1rem; margin:0 0.3rem; cursor:pointer; border-radius:5px; font-weight:bold; }
+.nav-btn.active { background:#357ABD; color:white; }
+main { padding:1rem; }
+.screen { display:none; }
+.screen.active { display:block; }
+
+.product-grid { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
+.product-grid button { flex:1 1 100px; padding:0.8rem; background:#4a90e2; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.2s; }
+.product-grid button:hover { background:#357ABD; }
+
+form { margin:1rem 0; display:flex; gap:0.5rem; flex-wrap:wrap; }
+form input, form select, form button { padding:0.5rem; border-radius:5px; border:1px solid #ccc; }
+form button { background:#4a90e2; color:white; border:none; cursor:pointer; transition:0.2s; }
+form button:hover { background:#357ABD; }
+
+ul { list-style:none; padding:0; margin:0.5rem 0; }
+li { padding:0.5rem; border-bottom:1px solid #ccc; display:flex; justify-content:space-between; align-items:center; }
+li button { background:#e74c3c; border:none; color:white; padding:0.3rem 0.5rem; border-radius:3px; cursor:pointer; }

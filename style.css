@@ -1,13 +1,101 @@
-body { font-family: sans-serif; margin: 0; padding: 0; }
-nav { display: flex; background:#444; }
-nav button { flex:1; padding:10px; color:#fff; background:none; border:none; cursor:pointer; }
-nav button.active { background:#666; }
-.page { display:none; padding:20px; }
-.page.active { display:block; }
-.prod-btn { margin:5px; padding:10px; border:none; color:#fff; cursor:pointer; }
-table { border-collapse: collapse; width: 100%; margin-top:10px; }
-table th, table td { border:1px solid #ccc; padding:5px; text-align:center; }
-.rmv { color:red; cursor:pointer; }
-input, select, button { margin:5px 0; padding:5px; }
-ul { list-style:none; padding:0; }
-ul li { padding:5px; border-bottom:1px solid #ccc; }
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f4f4f9;
+  color: #333;
+}
+
+header {
+  background: #4a90e2;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 2rem;
+  justify-content: center;
+}
+
+section {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 1rem;
+  width: 300px;
+}
+
+h2 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+input, select, button {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background: #4a90e2;
+  color: white;
+  cursor: pointer;
+  border: none;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #357abd;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #f9f9f9;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+li span.color {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.actions button {
+  background: #e74c3c;
+  margin-left: 0.3rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.actions button.edit {
+  background: #f39c12;
+}
+
+.actions button:hover {
+  opacity: 0.8;
+}

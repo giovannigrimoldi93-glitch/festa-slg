@@ -1,62 +1,49 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bar San Luigi</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestione Ordini</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>Gestione Ordini</h1>
+  </header>
 
-<nav>
-  <button data-page="home" class="active">Home</button>
-  <button data-page="settings">Impostazioni</button>
-  <button data-page="history">Storico</button>
-</nav>
+  <main>
+    <section class="categories">
+      <h2>Categorie</h2>
+      <form id="category-form">
+        <input type="text" id="category-name" placeholder="Nome categoria" required>
+        <input type="color" id="category-color" value="#ff0000">
+        <button type="submit">Aggiungi/Modifica</button>
+      </form>
+      <ul id="category-list"></ul>
+    </section>
 
-<!-- =================== HOME =================== -->
-<div id="home" class="page active">
-  <h1>Prodotti</h1>
-  <div id="productsContainer"></div>
+    <section class="products">
+      <h2>Prodotti</h2>
+      <form id="product-form">
+        <input type="text" id="product-name" placeholder="Nome prodotto" required>
+        <select id="product-category" required></select>
+        <input type="number" id="product-price" placeholder="Prezzo" required min="0">
+        <button type="submit">Aggiungi Prodotto</button>
+      </form>
+      <ul id="product-list"></ul>
+    </section>
 
-  <h2>Carrello</h2>
-  <table>
-    <thead><tr><th>Prodotto</th><th>Qtà</th><th>Prezzo</th><th>Rimuovi</th></tr></thead>
-    <tbody id="cartBody"></tbody>
-    <tfoot><tr><td colspan="2">Totale</td><td id="totalPrice">0.00</td><td></td></tr></tfoot>
-  </table>
-  <button id="printAndSend">Invia Ordine</button>
-</div>
+    <section class="orders">
+      <h2>Ordini</h2>
+      <form id="order-form">
+        <select id="order-product" required></select>
+        <input type="number" id="order-quantity" placeholder="Quantità" min="1" required>
+        <button type="submit">Aggiungi Ordine</button>
+      </form>
+      <ul id="order-list"></ul>
+    </section>
+  </main>
 
-<!-- =================== SETTINGS =================== -->
-<div id="settings" class="page">
-  <h1>Gestione Categorie</h1>
-  <input type="text" id="catName" placeholder="Nome categoria">
-  <input type="color" id="catColor" value="#333333">
-  <button id="addCategoryBtn">Aggiungi Categoria</button>
-  <ul id="categoriesList"></ul>
-
-  <h1>Gestione Prodotti</h1>
-  <select id="prodCat"></select>
-  <input type="text" id="prodName" placeholder="Nome prodotto">
-  <input type="number" id="prodPrice" placeholder="Prezzo">
-  <input type="checkbox" id="prodEnabled" checked> Abilitato
-  <button id="addProductBtn">Aggiungi Prodotto</button>
-  <ul id="productsList"></ul>
-</div>
-
-<!-- =================== HISTORY =================== -->
-<div id="history" class="page">
-  <h1>Storico Ordini</h1>
-  <input type="date" id="historyDate">
-  <button id="loadHistory">Carica</button>
-  <table id="historyTable">
-    <thead><tr><th>Prodotto</th><th>Qtà</th></tr></thead>
-    <tbody></tbody>
-    <tfoot><tr><td>Totale</td><td id="historyTotal">0.00</td></tr></tfoot>
-  </table>
-</div>
-
-<script type="module" src="app.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>

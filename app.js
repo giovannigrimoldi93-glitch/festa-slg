@@ -1,227 +1,124 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc,
-  deleteDoc, updateDoc, query, where, orderBy, runTransaction, increment, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-// ===================
-// --- Firebase ------
-const firebaseConfig = {
-  apiKey: "AIzaSyDNtqjDfxsV8TccejiE5Clffd1GvajryiU",
-  authDomain: "bar-san-luigi.firebaseapp.com",
-  projectId: "bar-san-luigi",
-  storageBucket: "bar-san-luigi.appspot.com",
-  messagingSenderId: "26384635672",
-  appId: "1:26384635672:web:672d98a954aa7e5dcaf06d"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ===================
-// --- Stato ---------
+// ======= DATI =======
 let categories = [];
 let products = [];
-let cart = [];
+let orders = [];
 
-// ===================
-// --- Utils ---------
-const byCatOrder = (a,b) => {
-  const ca = categories.find(c=>c.id===a.categoryId);
-  const cb = categories.find(c=>c.id===b.categoryId);
-  return (ca?.order||0) - (cb?.order||0) || a.name.localeCompare(b.name);
-};
-const euros = v => (Number(v)||0).toFixed(2);
+// ======= SELETTORI =======
+const categoryForm = document.getElementById('category-form');
+const categoryNameInput = document.getElementById('category-name');
+const categoryColorInput = document.getElementById('category-color');
+const categoryList = document.getElementById('category-list');
 
-// ===================
-// --- Caricamenti ---
-async function loadCategories() {
-  const snapshot = await getDocs(collection(db,"categories"));
-  categories = snapshot.docs.map(d => ({id:d.id, ...d.data()}));
-  renderSettingsCategories();
-  renderProductSelect();
-}
+const productForm = document.getElementById('product-form');
+const productNameInput = document.getElementById('product-name');
+const productCategorySelect = document.getElementById('product-category');
+const productPriceInput = document.getElementById('product-price');
+const productList = document.getElementById('product-list');
 
-async function loadProducts() {
-  const snapshot = await getDocs(collection(db,"products"));
-  products = snapshot.docs.map(d => ({id:d.id, ...d.data()}));
-  renderSettingsProducts();
-}
+const orderForm = document.getElementById('order-form');
+const orderProductSelect = document.getElementById('order-product');
+const orderQuantityInput = document.getElementById('order-quantity');
+const orderList = document.getElementById('order-list');
 
-// ===================
-// --- Render Home ---
-function renderProductsHome() {
-  const container = document.getElementById("productsContainer");
-  container.innerHTML = "";
-  products.sort(byCatOrder).forEach(p=>{
-    if(!p.enabled) return;
-    const btn = document.createElement("button");
-    btn.textContent = `${p.name} €${euros(p.price)}`;
-    btn.className = "prod-btn";
-    btn.style.backgroundColor = categories.find(c=>c.id===p.categoryId)?.color||"#333";
-    btn.onclick = () => addToCart(p);
-    container.appendChild(btn);
+let editingCategoryIndex = null;
+
+// ======= FUNZIONI =======
+function renderCategories() {
+  categoryList.innerHTML = '';
+  productCategorySelect.innerHTML = '<option value="">Seleziona categoria</option>';
+  
+  categories.forEach((cat, index) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${cat.name} <span class="color" style="background:${cat.color}"></span></span>
+                    <span class="actions">
+                      <button class="edit">Modifica</button>
+                      <button class="delete">Elimina</button>
+                    </span>`;
+    categoryList.appendChild(li);
+
+    productCategorySelect.innerHTML += `<option value="${index}">${cat.name}</option>`;
+
+    li.querySelector('.delete').onclick = () => {
+      categories.splice(index, 1);
+      renderCategories();
+      renderProducts();
+    };
+
+    li.querySelector('.edit').onclick = () => {
+      editingCategoryIndex = index;
+      categoryNameInput.value = cat.name;
+      categoryColorInput.value = cat.color;
+    };
   });
 }
 
-function addToCart(product) {
-  const item = cart.find(i=>i.id===product.id);
-  if(item) item.qty++;
-  else cart.push({...product, qty:1});
-  renderCart();
-}
+function renderProducts() {
+  productList.innerHTML = '';
+  orderProductSelect.innerHTML = '<option value="">Seleziona prodotto</option>';
 
-function renderCart() {
-  const tbody = document.getElementById("cartBody");
-  tbody.innerHTML = "";
-  let total = 0;
-  cart.forEach(item=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${item.name}</td>
-                    <td>${item.qty}</td>
-                    <td>€${euros(item.price*item.qty)}</td>
-                    <td><button class="rmv" onclick="removeFromCart('${item.id}')">x</button></td>`;
-    tbody.appendChild(tr);
-    total += item.price*item.qty;
+  products.forEach((prod, index) => {
+    const li = document.createElement('li');
+    const category = categories[prod.category]?.name || 'N/D';
+    li.textContent = `${prod.name} (${category}) - €${prod.price.toFixed(2)}`;
+    productList.appendChild(li);
+
+    orderProductSelect.innerHTML += `<option value="${index}">${prod.name}</option>`;
   });
-  document.getElementById("totalPrice").textContent = euros(total);
 }
 
-window.removeFromCart = function(id) {
-  cart = cart.filter(i=>i.id!==id);
-  renderCart();
+function renderOrders() {
+  orderList.innerHTML = '';
+
+  orders.forEach((order) => {
+    const li = document.createElement('li');
+    const product = products[order.product];
+    li.textContent = `${order.quantity} x ${product.name} - Totale: €${(product.price*order.quantity).toFixed(2)} (${new Date(order.timestamp).toLocaleString()})`;
+    orderList.appendChild(li);
+  });
 }
 
-// ===================
-// --- Invia Ordine --
-document.getElementById("printAndSend").onclick = async ()=>{
-  if(cart.length===0) return alert("Carrello vuoto!");
-  const order = {
-    timestamp: serverTimestamp(),
-    items: cart.map(i=>({id:i.id,name:i.name,qty:i.qty,price:i.price})),
-    total: cart.reduce((a,b)=>a+b.price*b.qty,0)
-  };
-  await addDoc(collection(db,"orders"), order);
-  cart = [];
-  renderCart();
-  alert("Ordine inviato!");
-}
+// ======= EVENTI =======
+categoryForm.onsubmit = (e) => {
+  e.preventDefault();
+  const name = categoryNameInput.value.trim();
+  const color = categoryColorInput.value;
 
-// ===================
-// --- Navigazione ---
-document.querySelectorAll("nav button").forEach(btn=>{
-  btn.onclick = ()=>{
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-    document.getElementById(btn.dataset.page).classList.add("active");
-    btn.classList.add("active");
+  if(editingCategoryIndex !== null) {
+    categories[editingCategoryIndex] = {name, color};
+    editingCategoryIndex = null;
+  } else {
+    categories.push({name, color});
   }
-});
 
-// ===================
-// --- Impostazioni ---
-// Categorie
-document.getElementById("addCategoryBtn").onclick = async ()=>{
-  const name = document.getElementById("catName").value.trim();
-  const color = document.getElementById("catColor").value;
-  if(!name) return;
-  const docRef = await addDoc(collection(db,"categories"), {name,color,order:categories.length});
-  categories.push({id:docRef.id,name,color,order:categories.length});
-  renderSettingsCategories();
-  renderProductSelect();
-  document.getElementById("catName").value="";
-}
+  categoryNameInput.value = '';
+  renderCategories();
+};
 
-function renderSettingsCategories(){
-  const ul = document.getElementById("categoriesList");
-  ul.innerHTML = "";
-  categories.forEach(c=>{
-    const li = document.createElement("li");
-    li.textContent = `${c.name} (${c.color})`;
-    const del = document.createElement("button");
-    del.textContent="x";
-    del.onclick = async ()=>{
-      await deleteDoc(doc(db,"categories",c.id));
-      categories = categories.filter(x=>x.id!==c.id);
-      renderSettingsCategories();
-      renderProductSelect();
-    }
-    li.appendChild(del);
-    ul.appendChild(li);
-  });
-}
+productForm.onsubmit = (e) => {
+  e.preventDefault();
+  const name = productNameInput.value.trim();
+  const category = productCategorySelect.value;
+  const price = parseFloat(productPriceInput.value);
 
-// Prodotti
-document.getElementById("addProductBtn").onclick = async ()=>{
-  const name = document.getElementById("prodName").value.trim();
-  const price = parseFloat(document.getElementById("prodPrice").value);
-  const categoryId = document.getElementById("prodCat").value;
-  const enabled = document.getElementById("prodEnabled").checked;
-  if(!name || !categoryId) return;
-  const docRef = await addDoc(collection(db,"products"), {name,price,categoryId,enabled});
-  products.push({id:docRef.id,name,price,categoryId,enabled});
-  renderSettingsProducts();
-  renderProductsHome();
-  document.getElementById("prodName").value="";
-  document.getElementById("prodPrice").value="";
-}
+  if(category === '') return alert('Seleziona una categoria!');
+  products.push({name, category, price});
+  productNameInput.value = '';
+  productPriceInput.value = '';
+  renderProducts();
+};
 
-function renderProductSelect(){
-  const sel = document.getElementById("prodCat");
-  sel.innerHTML = "";
-  categories.forEach(c=>{
-    const opt = document.createElement("option");
-    opt.value=c.id;
-    opt.textContent=c.name;
-    sel.appendChild(opt);
-  });
-}
+orderForm.onsubmit = (e) => {
+  e.preventDefault();
+  const productIndex = orderProductSelect.value;
+  const quantity = parseInt(orderQuantityInput.value);
 
-function renderSettingsProducts(){
-  const ul = document.getElementById("productsList");
-  ul.innerHTML = "";
-  products.forEach(p=>{
-    const li = document.createElement("li");
-    li.textContent = `${p.name} €${euros(p.price)} [${categories.find(c=>c.id===p.categoryId)?.name}] ${p.enabled?"✔":""}`;
-    const del = document.createElement("button");
-    del.textContent="x";
-    del.onclick = async ()=>{
-      await deleteDoc(doc(db,"products",p.id));
-      products = products.filter(x=>x.id!==p.id);
-      renderSettingsProducts();
-      renderProductsHome();
-    }
-    li.appendChild(del);
-    ul.appendChild(li);
-  });
-}
+  if(productIndex === '') return alert('Seleziona un prodotto!');
+  orders.push({product: productIndex, quantity, timestamp: Date.now()});
+  orderQuantityInput.value = '';
+  renderOrders();
+};
 
-// ===================
-// --- Storico -------
-document.getElementById("loadHistory").onclick = async ()=>{
-  const date = document.getElementById("historyDate").value;
-  if(!date) return;
-  const snapshot = await getDocs(collection(db,"orders"));
-  const orders = snapshot.docs.map(d=>d.data()).filter(o=>{
-    const d = o.timestamp?.toDate?.() || new Date();
-    return d.toISOString().slice(0,10)===date;
-  });
-  const tbody = document.querySelector("#historyTable tbody");
-  tbody.innerHTML = "";
-  let total = 0;
-  orders.forEach(o=>{
-    o.items.forEach(i=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${i.name}</td><td>${i.qty}</td>`;
-      tbody.appendChild(tr);
-      total += i.qty*i.price;
-    });
-  });
-  document.getElementById("historyTotal").textContent = euros(total);
-}
-
-// ===================
-// --- Inizializzazione --
-(async()=>{
-  await Promise.all([loadCategories(), loadProducts()]);
-  renderProductsHome();
-})();
+// ======= INIT =======
+renderCategories();
+renderProducts();
+renderOrders();

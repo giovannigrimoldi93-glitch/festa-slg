@@ -9,38 +9,53 @@
 <body>
   <header>
     <h1>Gestione Ordini</h1>
+    <nav>
+      <button data-screen="home">Home</button>
+      <button data-screen="settings">Impostazioni</button>
+      <button data-screen="history">Storico</button>
+    </nav>
   </header>
 
   <main>
-    <section class="categories">
-      <h2>Categorie</h2>
-      <form id="category-form">
-        <input type="text" id="category-name" placeholder="Nome categoria" required>
-        <input type="color" id="category-color" value="#ff0000">
-        <button type="submit">Aggiungi/Modifica</button>
-      </form>
-      <ul id="category-list"></ul>
-    </section>
-
-    <section class="products">
-      <h2>Prodotti</h2>
-      <form id="product-form">
-        <input type="text" id="product-name" placeholder="Nome prodotto" required>
-        <select id="product-category" required></select>
-        <input type="number" id="product-price" placeholder="Prezzo" required min="0">
-        <button type="submit">Aggiungi Prodotto</button>
-      </form>
-      <ul id="product-list"></ul>
-    </section>
-
-    <section class="orders">
-      <h2>Ordini</h2>
+    <!-- HOME -->
+    <section id="home-screen" class="screen">
+      <h2>Ordina Prodotti</h2>
       <form id="order-form">
         <select id="order-product" required></select>
         <input type="number" id="order-quantity" placeholder="Quantità" min="1" required>
         <button type="submit">Aggiungi Ordine</button>
       </form>
       <ul id="order-list"></ul>
+    </section>
+
+    <!-- IMPOSTAZIONI -->
+    <section id="settings-screen" class="screen hidden">
+      <div class="categories">
+        <h2>Categorie</h2>
+        <form id="category-form">
+          <input type="text" id="category-name" placeholder="Nome categoria" required>
+          <input type="color" id="category-color" value="#ff0000">
+          <button type="submit">Aggiungi/Modifica</button>
+        </form>
+        <ul id="category-list"></ul>
+      </div>
+
+      <div class="products">
+        <h2>Prodotti</h2>
+        <form id="product-form">
+          <input type="text" id="product-name" placeholder="Nome prodotto" required>
+          <select id="product-category" required></select>
+          <input type="number" id="product-price" placeholder="Prezzo" required min="0">
+          <button type="submit">Aggiungi Prodotto</button>
+        </form>
+        <ul id="product-list"></ul>
+      </div>
+    </section>
+
+    <!-- STORICO -->
+    <section id="history-screen" class="screen hidden">
+      <h2>Storico Ordini</h2>
+      <ul id="history-list"></ul>
     </section>
   </main>
 

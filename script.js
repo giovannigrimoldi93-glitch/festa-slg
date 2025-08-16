@@ -296,7 +296,7 @@ function openReceiptWindow({ orderNumber, now, items, total }) {
       @media print {
         @page { size: 80mm auto; margin: 4mm; }
       }
-      body { font-family: "Arial", sans-serif; width: 80mm; margin: 0 auto; }
+      body { font-family: "Courier New", monospace; width: 80mm; margin: 0 auto; }
       .center { text-align: center; }
       .big { font-size: 18px; font-weight: 700; }
       .line { display: flex; justify-content: space-between; margin: 4px 0; }

@@ -169,12 +169,26 @@ async function addToCart(productId) {
   renderHome(); // aggiorna bottoni con stock aggiornato
 }
 
-function removeOneFromCart(productId) {
+async function removeOneFromCart(productId) {
   const item = cart.find(i => i.productId === productId);
   if (!item) return;
+
+  // Incrementa lo stock locale e su Firebase
+  const prod = findProduct(productId);
+  if (prod && prod.stock !== null && prod.stock !== undefined) {
+    prod.stock += 1; // reintegra locale
+    const ref = doc(db, "products", prod.id);
+    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
+  }
+
+  // Riduci quantità carrello
   item.qty -= 1;
-  if (item.qty <= 0) cart = cart.filter(i => i.productId !== productId);
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.productId !== productId);
+  }
+
   renderCart();
+  renderHome(); // aggiorna bottoni con nuovo stock
 }
 
 function renderCart() {

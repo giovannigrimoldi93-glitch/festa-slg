@@ -115,34 +115,19 @@ function renderProductSelects() {
 
 // ---------------- HOME: rendering prodotti + carrello ----------------
 function renderHome() {
-  // Mostra categorie con i relativi prodotti attivi. Tutti sempre visibili e in ordine.
   productsButtons.innerHTML = "";
   categories.forEach(cat => {
-    const section = document.createElement("div");
-    section.style.margin = "10px 0";
-    section.innerHTML = `<h3 style="color:${cat.color}">${cat.name}</h3>`;
-    const grid = document.createElement("div");
-    grid.style.display = "flex";
-    grid.style.flexWrap = "wrap";
-    grid.style.gap = "8px";
     products
       .filter(p => p.category === cat.id && p.active)
       .forEach(prod => {
         const btn = document.createElement("button");
         btn.className = "product-btn";
         btn.style.background = cat.color;
-        btn.style.color = "#fff";
-        btn.style.border = "none";
-        btn.style.borderRadius = "8px";
-        btn.style.padding = "10px";
-        btn.style.cursor = "pointer";
         const stockStr = (prod.stock === null || prod.stock === undefined) ? "" : ` [${prod.stock}]`;
-        btn.textContent = `${prod.name} (${EUR(prod.price)})${stockStr}`;
+        btn.textContent = `${prod.name}\n${EUR(prod.price)}${stockStr}`;
         btn.onclick = () => addToCart(prod.id);
-        grid.appendChild(btn);
+        productsButtons.appendChild(btn);
       });
-    section.appendChild(grid);
-    productsButtons.appendChild(section);
   });
 }
 

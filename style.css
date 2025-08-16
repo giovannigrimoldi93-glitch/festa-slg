@@ -35,3 +35,59 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 .modal-content button { background: #004aad; color: white; border: none; border-radius: 6px; padding: 8px; cursor: pointer; }
 .modal-content button:hover { background: #003080; }
 .modal-close { background: red !important; }
+
+/* === HOME === */
+#products-buttons { ... }
+.product-btn { ... }
+#cart { ... }
+#cart h3 { ... }
+#cart-list { ... }
+#cart-list li { ... }
+#cart-total { ... }
+#print-order { ... }
+#print-order:hover { ... }
+
+/* === HOME 2 COLONNE === */
+#home-content {
+  display: flex;
+  gap: 20px;
+}
+
+#products-column {
+  flex: 7;
+}
+
+#cart-column {
+  flex: 3;
+}
+
+/* Assicurati che i bottoni siano fluidi */
+#products-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.product-btn {
+  flex: 1 0 160px;
+  min-height: 80px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  cursor: pointer;
+  color: white;
+  text-shadow:
+    -1px -1px 0 #000,  
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
+
+#cart-column #cart {
+  position: sticky;
+  top: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}

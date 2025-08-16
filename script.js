@@ -166,7 +166,6 @@ async function addToCart(productId) {
   }
 
   renderCart();
-  cartTotalEl.innerHTML = `<strong style="color:#004aad; font-size:18px;">Totale: ${EUR(total)}</strong>`;
   renderHome(); // aggiorna bottoni con stock aggiornato
 }
 
@@ -207,7 +206,7 @@ function renderCart() {
     cartList.appendChild(li);
     total += i.price * i.qty;
   });
-  cartTotalEl.textContent = `Totale: ${EUR(total)}`;
+  cartTotalEl.innerHTML = `<strong style="color:#004aad; font-size:18px;">Totale: €${total.toFixed(2)}</strong>`;
 }
 
 printBtn.addEventListener("click", async () => {

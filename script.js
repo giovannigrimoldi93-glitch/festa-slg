@@ -16,6 +16,12 @@ loginForm.addEventListener("submit", (e) => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".page").forEach(section => {
+    if (section.id !== "login") section.style.display = "none";
+  });
+});
+
 // ---------------- Firebase ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {

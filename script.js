@@ -297,6 +297,7 @@ function openReceiptWindow({ orderNumber, now, items, total }) {
     <hr>
     <div class="line total"><span>TOTALE</span><span>${EUR(total)}</span></div>
     <div class="center" style="margin-top:6px;">Grazie!</div>
+    <div class="center" style="margin-top:2px; font-size:12px; font-weight:normal;">Non fiscale </div>
   `;
 
   const w = window.open("", "PRINT", "width=400,height=600");

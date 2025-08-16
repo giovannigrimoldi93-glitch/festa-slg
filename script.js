@@ -68,7 +68,7 @@ async function loadBarName() {
     await setDoc(ref, { name: "San Luigi" });
     barName = "San Luigi";
   }
-  document.querySelector("header h1").textContent = `Bar ${barName}`;
+  document.querySelector("header h1").textContent = `Festa ${barName}`;
 }
 
 async function getNextOrderNumber() {

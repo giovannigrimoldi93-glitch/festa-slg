@@ -84,6 +84,22 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
     -1px  1px 0 #000,
      1px  1px 0 #000;
 }
+/* Effetti hover e click sui bottoni prodotti */
+.product-btn {
+  transition: transform 0.2s, box-shadow 0.2s; /* transizione fluida */
+  cursor: pointer;
+}
+
+.product-btn:hover {
+  transform: scale(1.1); /* ingrandimento 10% */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* ombra evidente */
+  filter: brightness(1.1); /* leggero aumento luminosità */
+}
+
+.product-btn:active {
+  transform: scale(0.95); /* rimbalzo al click */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* ombra ridotta */
+}
 
 #cart-column #cart {
   position: sticky;

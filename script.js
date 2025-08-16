@@ -125,23 +125,48 @@ function renderHome() {
         btn.style.background = cat.color;
         const stockStr = (prod.stock === null || prod.stock === undefined) ? "" : ` [${prod.stock}]`;
         btn.textContent = `${prod.name}\n${EUR(prod.price)}${stockStr}`;
+
+        // Disabilita bottone se stock = 0
+        if (prod.stock === 0) {
+          btn.disabled = true;
+          btn.style.opacity = "0.5";
+          btn.style.cursor = "not-allowed";
+        } else {
+          btn.disabled = false;
+          btn.style.opacity = "1";
+          btn.style.cursor = "pointer";
+        }
+
         btn.onclick = () => addToCart(prod.id);
         productsButtons.appendChild(btn);
       });
   });
 }
 
-function addToCart(productId) {
+async function addToCart(productId) {
   const prod = findProduct(productId);
   if (!prod) return;
+
+  // Controlla stock
   if (prod.stock !== null && prod.stock !== undefined && prod.stock <= 0) {
     alert("Prodotto esaurito!");
     return;
   }
+
+  // Aggiunge al carrello
   const existing = cart.find(i => i.productId === productId);
   if (existing) existing.qty += 1;
   else cart.push({ productId, name: prod.name, price: prod.price, qty: 1 });
+
+  // Decrementa stock subito
+  if (prod.stock !== null && prod.stock !== undefined) {
+    prod.stock -= 1; // aggiorna locale
+    const ref = doc(db, "products", prod.id);
+    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
+  }
+
   renderCart();
+  renderHome(); // aggiorna bottoni con stock aggiornato
 }
 
 function removeOneFromCart(productId) {

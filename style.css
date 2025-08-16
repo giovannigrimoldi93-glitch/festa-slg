@@ -121,12 +121,6 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
   transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
 }
 
-#print-order:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-  box-shadow: 0 5px 12px rgba(0,0,0,0.3);
-}
-
 #print-order:active {
   transform: scale(0.97);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);

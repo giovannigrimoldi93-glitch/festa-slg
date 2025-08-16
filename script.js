@@ -298,7 +298,7 @@ function openReceiptWindow({ orderNumber, now, items, total }) {
       }
       body { font-family: "Courier New", monospace; width: 80mm; margin: 0 auto; }
       .center { text-align: center; }
-      .big { font-size: 18px; font-weight: 700; }
+      .big { font-size: 16px; font-weight: 700; }
       .line { display: flex; justify-content: space-between; margin: 4px 0; }
       hr { border: 0; border-top: 1px dashed #000; margin: 6px 0; }
       .total { font-size: 20px; font-weight: 800; }
@@ -308,7 +308,7 @@ function openReceiptWindow({ orderNumber, now, items, total }) {
   let html = `
     <div class="center">
       <img src="${logo}" alt="logo" style="height:60px;">
-      <div class="big upper">Bar ${barName}</div>
+      <div class="big upper">${barName}</div>
       <div>Ordine n. ${orderNumber}</div>
       <div>${now.toLocaleDateString()} ${now.toLocaleTimeString()}</div>
     </div>

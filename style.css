@@ -126,10 +126,4 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-#cart-total {
-  margin-top: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: right;
-  color: #004aad; /* opzionale: colore tema blu */
-}
+#cart-total { ... }

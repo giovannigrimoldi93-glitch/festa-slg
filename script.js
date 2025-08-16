@@ -166,6 +166,7 @@ async function addToCart(productId) {
   }
 
   renderCart();
+  cartTotalEl.innerHTML = `<strong style="color:#004aad; font-size:18px;">Totale: ${EUR(total)}</strong>`;
   renderHome(); // aggiorna bottoni con stock aggiornato
 }
 

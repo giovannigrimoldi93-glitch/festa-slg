@@ -399,12 +399,21 @@ document.getElementById("product-form").addEventListener("submit", async (e) => 
 
 function renderSettingsProducts() {
   productsList.innerHTML = "";
-  products.forEach(prod => {
+
+  // ordina prodotti per categoria (poi per nome)
+  const sortedProducts = products.slice().sort((a, b) => {
+    const catA = categories.find(c => c.id === a.category)?.order ?? 0;
+    const catB = categories.find(c => c.id === b.category)?.order ?? 0;
+    if (catA !== catB) return catA - catB;           // prima categoria
+    return a.name.localeCompare(b.name, "it");     // poi nome prodotto
+  });
+
+  sortedProducts.forEach(prod => {
     const catName = categories.find(c => c.id === prod.category)?.name || "–";
     productsList.insertAdjacentHTML("beforeend", `
       <tr>
         <td>${prod.name}</td>
-        <td>${EUR(prod.price)}</td>
+        <td>€${prod.price.toFixed(2)}</td>
         <td>${prod.stock ?? "∞"}</td>
         <td>${prod.active ? "✅" : "❌"}</td>
         <td>${catName}</td>

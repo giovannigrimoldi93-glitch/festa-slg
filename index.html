@@ -2,54 +2,93 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestione Ordini</title>
+  <title>San Luigi - Gestione Ordini</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Gestione Ordini</h1>
-    <nav>
-      <button id="btn-home" class="nav-btn active">Home</button>
-      <button id="btn-settings" class="nav-btn">Impostazioni</button>
-      <button id="btn-history" class="nav-btn">Storico</button>
-    </nav>
+    <img src="https://raw.githubusercontent.com/giovannigrimoldi93-glitch/bar-sl-files/refs/heads/main/Logo-parrocchia-2.svg" alt="Logo">
+    <h1 id="bar-name">San Luigi</h1>
   </header>
+
+  <nav>
+    <button id="nav-home" class="active">Home</button>
+    <button id="nav-settings">Impostazioni</button>
+    <button id="nav-history">Storico ordini</button>
+  </nav>
 
   <main>
     <!-- HOME -->
-    <section id="home-screen" class="screen active">
-      <h2>Ordina Prodotti</h2>
-      <div id="product-buttons" class="product-grid"></div>
+    <section id="home">
+      <div id="categories"></div>
+      <div id="cart">
+        <h3>Carrello</h3>
+        <div id="cart-items"></div>
+        <div id="cart-total">Totale: €0.00</div>
+        <button id="print-btn">Stampa e invia</button>
+      </div>
     </section>
 
     <!-- IMPOSTAZIONI -->
-    <section id="settings-screen" class="screen">
-      <h2>Gestione Categorie</h2>
-      <form id="category-form">
-        <input type="text" id="category-name" placeholder="Nome categoria" required>
-        <input type="color" id="category-color" value="#ff0000">
-        <button type="submit">Aggiungi Categoria</button>
-      </form>
-      <ul id="category-list"></ul>
+    <section id="settings">
+      <h2>Accesso impostazioni</h2>
+      <input type="password" id="settings-password" placeholder="Password">
+      <button id="settings-login">Entra</button>
 
-      <h2>Gestione Prodotti</h2>
-      <form id="product-form">
-        <input type="text" id="product-name" placeholder="Nome prodotto" required>
-        <select id="product-category" required></select>
-        <input type="number" id="product-price" placeholder="Prezzo" min="0" required>
-        <button type="submit">Aggiungi Prodotto</button>
-      </form>
-      <ul id="product-list"></ul>
+      <div id="settings-content" style="display:none;">
+        <h2>Impostazioni</h2>
+
+        <!-- Nome bar -->
+        <form id="bar-form">
+          <h3>Nome del bar</h3>
+          <input type="text" id="bar-name-input" placeholder="Nome del bar">
+          <button type="submit">Salva</button>
+        </form>
+
+        <!-- Categorie -->
+        <form id="category-form">
+          <h3>Aggiungi Categoria</h3>
+          <input type="text" id="category-name" placeholder="Nome categoria" required>
+          <input type="color" id="category-color" value="#004080">
+          <input type="number" id="category-order" placeholder="Ordine">
+          <button type="submit">Salva Categoria</button>
+        </form>
+        <div id="categories-list"></div>
+
+        <!-- Prodotti -->
+        <form id="product-form">
+          <h3>Aggiungi Prodotto</h3>
+          <input type="text" id="product-name" placeholder="Nome prodotto" required>
+          <input type="number" id="product-price" placeholder="Prezzo (€)" required>
+          <input type="number" id="product-stock" placeholder="Quantità (vuoto=∞)">
+          <select id="product-category"></select>
+          <label><input type="checkbox" id="product-active" checked> Attivo</label>
+          <button type="submit">Salva Prodotto</button>
+        </form>
+        <div id="products-list"></div>
+      </div>
     </section>
 
     <!-- STORICO -->
-    <section id="history-screen" class="screen">
+    <section id="history">
       <h2>Storico Ordini</h2>
-      <ul id="history-list"></ul>
+      <form id="history-form">
+        <input type="date" id="history-date">
+        <button type="submit">Vai!</button>
+      </form>
+      <table>
+        <thead>
+          <tr><th>Prodotto</th><th>Quantità</th></tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+        <tfoot>
+          <tr><td>Totale €</td><td id="history-total">0.00</td></tr>
+        </tfoot>
+      </table>
+      <button id="export-csv">Esporta CSV</button>
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -1,22 +1,158 @@
-* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-body { margin:0; background:#f0f2f5; color:#333; }
-header { background:#4a90e2; color:white; padding:1rem; text-align:center; }
-nav { margin-top:0.5rem; }
-.nav-btn { background:white; color:#4a90e2; border:none; padding:0.5rem 1rem; margin:0 0.3rem; cursor:pointer; border-radius:5px; font-weight:bold; }
-.nav-btn.active { background:#357ABD; color:white; }
-main { padding:1rem; }
-.screen { display:none; }
-.screen.active { display:block; }
+/* Colori e font */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+  color: #333;
+}
 
-.product-grid { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; }
-.product-grid button { flex:1 1 100px; padding:0.8rem; background:#4a90e2; color:white; border:none; border-radius:5px; cursor:pointer; transition:0.2s; }
-.product-grid button:hover { background:#357ABD; }
+header {
+  display: flex;
+  align-items: center;
+  background: #004080; /* blu tema */
+  color: white;
+  padding: 10px;
+}
 
-form { margin:1rem 0; display:flex; gap:0.5rem; flex-wrap:wrap; }
-form input, form select, form button { padding:0.5rem; border-radius:5px; border:1px solid #ccc; }
-form button { background:#4a90e2; color:white; border:none; cursor:pointer; transition:0.2s; }
-form button:hover { background:#357ABD; }
+header img {
+  height: 50px;
+  margin-right: 10px;
+}
 
-ul { list-style:none; padding:0; margin:0.5rem 0; }
-li { padding:0.5rem; border-bottom:1px solid #ccc; display:flex; justify-content:space-between; align-items:center; }
-li button { background:#e74c3c; border:none; color:white; padding:0.3rem 0.5rem; border-radius:3px; cursor:pointer; }
+header h1 {
+  font-size: 1.5em;
+}
+
+nav {
+  background: #003366;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+}
+
+nav button {
+  background: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #004080;
+}
+
+nav button.active {
+  background: #004080;
+  color: white;
+}
+
+main {
+  padding: 20px;
+}
+
+/* --- HOME --- */
+#home {
+  display: none;
+}
+
+.category {
+  margin-bottom: 20px;
+}
+
+.category h2 {
+  color: #004080;
+}
+
+.products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.product-btn {
+  flex: 1 0 120px;
+  padding: 15px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+#cart {
+  margin-top: 20px;
+  border: 2px solid #004080;
+  padding: 15px;
+  border-radius: 8px;
+  background: white;
+}
+
+#cart h3 {
+  margin-top: 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.cart-item img {
+  height: 20px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+#cart-total {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+#print-btn {
+  margin-top: 15px;
+  background: #004080;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* --- IMPOSTAZIONI --- */
+#settings {
+  display: none;
+}
+
+#settings form {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* --- STORICO --- */
+#history {
+  display: none;
+}
+
+#history table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#history th, #history td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+#history th {
+  background: #004080;
+  color: white;
+}
+
+#history tfoot td {
+  font-weight: bold;
+}

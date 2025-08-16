@@ -106,4 +106,5 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
   top: 20px;
   max-height: 80vh;
   overflow-y: auto;
+  margin-right: 20px;   /* aggiunge spazio a destra */
 }

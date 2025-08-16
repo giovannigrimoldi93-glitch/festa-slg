@@ -43,7 +43,6 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 #cart h3 { ... }
 #cart-list { ... }
 #cart-list li { ... }
-#cart-total { ... }
 
 /* === HOME 2 COLONNE === */
 #home-content {
@@ -125,4 +124,12 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 #print-order:active {
   transform: scale(0.97);
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+#cart-total {
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: right;
+  color: #004aad; /* opzionale: colore tema blu */
 }

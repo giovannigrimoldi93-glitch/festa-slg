@@ -127,3 +127,7 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 }
 
 #cart-total { ... }
+
+.page {
+  padding-left: 5px;
+}

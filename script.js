@@ -231,46 +231,73 @@ function renderCart() {
   cartTotalEl.innerHTML = `<strong style="color:#004aad; font-size:18px;">Totale: €${total.toFixed(2)}</strong>`;
 }
 
+// ---------------- STAMPA E INVIA ORDINE ----------------
 printBtn.addEventListener("click", async () => {
-  if (cart.length === 0) return;
-
-  // Calcolo totale
-  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-
-  // Ottieni numero progressivo
-  const orderNumber = await getNextOrderNumber();
-
-  // Prepara data/ora e dayKey locale
-  const now = new Date();
-  const dayKey = todayKeyInRome(now);
-
-  // Salva ordine in Firestore
-  const orderPayload = {
-    createdAt: serverTimestamp(),
-    localDateTime: now.toISOString(),
-    dayKey,                    // per query giornaliera
-    number: orderNumber,       // progressivo
-    items: cart.map(i => ({ productId: i.productId, name: i.name, price: i.price, qty: i.qty })),
-    total
-  };
-  await addDoc(collection(db, "orders"), orderPayload);
-
-  // Decrementa stock per ciascun prodotto se non infinito
-  for (const i of cart) {
-    const prod = findProduct(i.productId);
-    if (!prod) continue;
-    if (prod.stock === null || prod.stock === undefined) continue;
-    const ref = doc(db, "products", prod.id);
-    await updateDoc(ref, { stock: Math.max(0, (prod.stock || 0) - i.qty) });
+  if (cart.length === 0) {
+    alert("Carrello vuoto!");
+    return;
   }
 
-  // Refresh prodotti (per aggiornare stock visibile) e azzera carrello
-  await loadProducts();
-  cart = [];
-  renderCart();
+  try {
+    const orderNumber = await getNextOrderNumber();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("it-IT");
+    const timeStr = now.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 
-  // Stampa scontrino ottimizzato 80mm
-  openReceiptWindow({ orderNumber, now, items: orderPayload.items, total, dayKey });
+    // Salva ordine su Firestore
+    await addDoc(collection(db, "orders"), {
+      items: cart,
+      total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+      createdAt: serverTimestamp(),
+      orderNumber
+    });
+
+    // Genera contenuto scontrino
+    const receiptWin = window.open("", "Stampa", "width=400,height=600");
+    receiptWin.document.write(`
+      <html>
+        <head>
+          <style>
+            body { font-family: monospace; font-size:16px; text-align:center; }
+            h2 { margin: 4px 0; }
+            .line { margin: 8px 0; border-top: 1px dashed #000; }
+            .item { display:flex; justify-content:space-between; font-size:18px; font-weight:bold; }
+            .totale { margin-top:8px; font-size:20px; font-weight:bold; }
+            .small { font-size:12px; margin-top:4px; }
+          </style>
+        </head>
+        <body>
+          <h2>${barName}</h2>
+          <img src="https://raw.githubusercontent.com/giovannigrimoldi93-glitch/bar-sl-files/refs/heads/main/Logo-parrocchia-2.svg" width="80"/>
+          <div>${dateStr} ${timeStr}</div>
+          <div>Ordine #${orderNumber}</div>
+          <div class="line"></div>
+          ${cart.map(i => `
+            <div class="item">
+              <span>${i.name} x${i.qty}</span>
+              <span>${EUR(i.price * i.qty)}</span>
+            </div>
+          `).join("")}
+          <div class="line"></div>
+          <div class="totale">TOTALE: ${EUR(cart.reduce((s,i)=>s+i.price*i.qty,0))}</div>
+          <div class="line"></div>
+          <div style="margin-top:8px;">Grazie!</div>
+          <div class="small">NON FISCALE</div>
+        </body>
+      </html>
+    `);
+    receiptWin.document.close();
+    receiptWin.print();
+
+    // Svuota carrello
+    cart = [];
+    renderCart();
+    renderHome();
+
+  } catch (err) {
+    console.error("Errore stampa ordine:", err);
+    alert("Errore durante la stampa dell'ordine.");
+  }
 });
 
 function openReceiptWindow({ orderNumber, now, items, total }) {

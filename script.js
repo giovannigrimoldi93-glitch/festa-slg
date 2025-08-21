@@ -1,27 +1,3 @@
-// -----------------login
-const LOGIN_PASSWORD = "admin"; // password di default
-
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const pwd = document.getElementById("login-password").value;
-  if (pwd === LOGIN_PASSWORD) {
-    // Nasconde login e mostra home
-    document.getElementById("login").style.display = "none";
-    showPage("home");
-  } else {
-    loginError.style.display = "block";
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".page").forEach(section => {
-    if (section.id !== "login") section.style.display = "none";
-  });
-});
-
 // ---------------- Firebase ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {

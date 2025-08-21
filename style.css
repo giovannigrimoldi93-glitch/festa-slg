@@ -131,3 +131,56 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 .page {
   padding-left: 5px;
 }
+
+/* --- RESPONSIVE --- */
+
+/* Schermi piccoli (max 768px, es. tablet verticali e smartphone) */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding: 5px;
+  }
+
+  header h1 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .product-btn {
+    font-size: 16px;
+    padding: 12px;
+    width: 45%;         /* due bottoni per riga */
+    margin: 5px 2%;
+  }
+
+  #cart {
+    width: 100%;        /* carrello a tutta larghezza */
+    margin-top: 15px;
+    padding: 10px;
+  }
+
+  #cart-total strong {
+    font-size: 16px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+/* Schermi molto piccoli (max 480px, smartphone piccoli) */
+@media (max-width: 480px) {
+  .product-btn {
+    width: 100%;       /* bottoni uno sotto l’altro */
+    font-size: 15px;
+  }
+
+  header h1 {
+    font-size: 18px;
+  }
+
+  #cart {
+    font-size: 14px;
+  }
+}

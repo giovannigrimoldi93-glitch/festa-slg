@@ -183,4 +183,9 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
   #cart {
     font-size: 14px;
   }
+
+  /* NUOVO: il contenitore passa da "affiancato" a colonna */
+  .home-container {
+    flex-direction: column;
+  } 
 }

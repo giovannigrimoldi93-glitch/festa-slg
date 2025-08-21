@@ -170,6 +170,16 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 }
 
 @media (max-width: 480px) {
+  #home-content {
+    flex-direction: column;   /* carrello sotto i bottoni */
+  }
+
+  #cart-column {
+    flex: 1 1 100%;
+    max-width: 100%;
+    margin-top: 15px;
+  }
+
   .product-btn {
     width: 100%;       /* bottoni uno sotto l’altro */
     font-size: 15px;
@@ -181,12 +191,5 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 
   #cart {
     font-size: 14px;
-    max-width: 100%;
-    margin-top: 15px;
-  }
-
-  /* NUOVO: il contenitore passa da "affiancato" a colonna */
-  .home-container {
-    flex-direction: column;
   }
 }

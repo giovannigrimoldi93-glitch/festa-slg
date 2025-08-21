@@ -1,3 +1,27 @@
+// -----------------login
+const LOGIN_PASSWORD = "admin"; // password di default
+
+const loginForm = document.getElementById("login-form");
+const loginError = document.getElementById("login-error");
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const pwd = document.getElementById("login-password").value;
+  if (pwd === LOGIN_PASSWORD) {
+    // Nasconde login e mostra home
+    document.getElementById("login").style.display = "none";
+    showPage("home");
+  } else {
+    loginError.style.display = "block";
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".page").forEach(section => {
+    if (section.id !== "login") section.style.display = "none";
+  });
+});
+
 // ---------------- Firebase ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
@@ -143,71 +167,52 @@ function renderHome() {
   });
 }
 
-import { runTransaction, doc } from "firebase/firestore";
-
-// Aggiunge un prodotto al carrello con transaction
 async function addToCart(productId) {
   const prod = findProduct(productId);
   if (!prod) return;
 
-  try {
-    const prodRef = doc(db, "products", productId);
-
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(prodRef);
-      if (!snap.exists()) throw "Prodotto non trovato!";
-      const data = snap.data();
-
-      if (data.stock !== null && data.stock !== undefined) {
-        if (data.stock <= 0) throw "Prodotto esaurito!";
-        tx.update(prodRef, { stock: data.stock - 1 });
-        prod.stock = data.stock - 1; // aggiorna locale
-      }
-    });
-
-    // aggiorna carrello locale
-    const existing = cart.find(i => i.productId === productId);
-    if (existing) existing.qty += 1;
-    else cart.push({ productId, name: prod.name, price: prod.price, qty: 1 });
-
-    renderCart();
-    renderHome(); // aggiorna bottoni
-  } catch (err) {
-    alert(err);
+  // Controlla stock
+  if (prod.stock !== null && prod.stock !== undefined && prod.stock <= 0) {
+    alert("Prodotto esaurito!");
+    return;
   }
+
+  // Aggiunge al carrello
+  const existing = cart.find(i => i.productId === productId);
+  if (existing) existing.qty += 1;
+  else cart.push({ productId, name: prod.name, price: prod.price, qty: 1 });
+
+  // Decrementa stock subito
+  if (prod.stock !== null && prod.stock !== undefined) {
+    prod.stock -= 1; // aggiorna locale
+    const ref = doc(db, "products", prod.id);
+    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
+  }
+
+  renderCart();
+  renderHome(); // aggiorna bottoni con stock aggiornato
 }
 
-// Rimuove una unità dal carrello con transaction
 async function removeOneFromCart(productId) {
   const item = cart.find(i => i.productId === productId);
   if (!item) return;
 
-  try {
-    const prod = findProduct(productId);
-    const prodRef = doc(db, "products", productId);
-
-    await runTransaction(db, async (tx) => {
-      const snap = await tx.get(prodRef);
-      if (!snap.exists()) throw "Prodotto non trovato!";
-      const data = snap.data();
-
-      if (data.stock !== null && data.stock !== undefined) {
-        tx.update(prodRef, { stock: data.stock + 1 });
-        prod.stock = data.stock + 1; // aggiorna locale
-      }
-    });
-
-    // aggiorna carrello locale
-    item.qty -= 1;
-    if (item.qty <= 0) {
-      cart = cart.filter(i => i.productId !== productId);
-    }
-
-    renderCart();
-    renderHome(); // aggiorna bottoni
-  } catch (err) {
-    console.error("Errore nella rimozione:", err);
+  // Incrementa lo stock locale e su Firebase
+  const prod = findProduct(productId);
+  if (prod && prod.stock !== null && prod.stock !== undefined) {
+    prod.stock += 1; // reintegra locale
+    const ref = doc(db, "products", prod.id);
+    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
   }
+
+  // Riduci quantità carrello
+  item.qty -= 1;
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.productId !== productId);
+  }
+
+  renderCart();
+  renderHome(); // aggiorna bottoni con nuovo stock
 }
 
 function renderCart() {

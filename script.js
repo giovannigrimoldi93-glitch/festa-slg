@@ -249,6 +249,7 @@ printBtn.addEventListener("click", async () => {
       items: cart,
       total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
       createdAt: serverTimestamp(),
+      dayKey,
       orderNumber
     });
 

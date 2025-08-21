@@ -243,10 +243,12 @@ printBtn.addEventListener("click", async () => {
     const now = new Date();
     const dateStr = now.toLocaleDateString("it-IT");
     const timeStr = now.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
+    const dayKey = todayKeyInRome(now);
 
     // Salva ordine su Firestore
     await addDoc(collection(db, "orders"), {
       items: cart,
+      dayKey,
       total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
       createdAt: serverTimestamp(),
       orderNumber

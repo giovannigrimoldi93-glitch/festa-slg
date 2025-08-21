@@ -244,16 +244,13 @@ printBtn.addEventListener("click", async () => {
     const dateStr = now.toLocaleDateString("it-IT");
     const timeStr = now.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" });
 
-    // Salva su Firestone 
-    const orderPayload = {
-    createdAt: serverTimestamp(),
-    localDateTime: now.toISOString(),
-    dayKey,                    // per query giornaliera
-    number: orderNumber,       // progressivo
-    items: cart.map(i => ({ productId: i.productId, name: i.name, price: i.price, qty: i.qty })),
-    total
-  };
-  await addDoc(collection(db, "orders"), orderPayload);
+    // Salva ordine su Firestore
+    await addDoc(collection(db, "orders"), {
+      items: cart,
+      total: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+      createdAt: serverTimestamp(),
+      orderNumber
+    });
 
     // Genera contenuto scontrino
     const receiptWin = window.open("", "Stampa", "width=400,height=600");

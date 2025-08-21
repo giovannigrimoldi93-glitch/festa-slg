@@ -546,7 +546,7 @@ historyForm.addEventListener("submit", async (e) => {
   [...totals.entries()].sort((a, b) => a[0].localeCompare(b[0], "it")).forEach(([name, qty]) => {
     historyBody.insertAdjacentHTML("beforeend", `<tr><td>${name}</td><td>${qty}</td></tr>`);
   });
-  historyTotalEl.innerHTML = `<strong>Totale: ${EUR(totalRevenue)}</strong>`;
+  historyTotalEl.innerHTML = `<strong style="font-size:18px;">Totale: ${EUR(totalRevenue)}</strong>`;
 });
 
 // CSV export

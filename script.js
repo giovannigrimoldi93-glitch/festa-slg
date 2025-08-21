@@ -1,32 +1,8 @@
-// -----------------login
-const LOGIN_PASSWORD = "admin"; // password di default
-
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-
-loginForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const pwd = document.getElementById("login-password").value;
-  if (pwd === LOGIN_PASSWORD) {
-    // Nasconde login e mostra home
-    document.getElementById("login").style.display = "none";
-    showPage("home");
-  } else {
-    loginError.style.display = "block";
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".page").forEach(section => {
-    if (section.id !== "login") section.style.display = "none";
-  });
-});
-
 // ---------------- Firebase ----------------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, addDoc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, doc,
-  runTransaction, serverTimestamp, query, where, orderBy, increment
+  runTransaction, serverTimestamp, query, where, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -74,8 +50,7 @@ const modalProduct = document.getElementById("modal-product");
 // ---------------- Utils ----------------
 const EUR = v => `€${Number(v).toFixed(2)}`;
 function todayKeyInRome(d = new Date()) {
-  // converte in fuso Italia (Europe/Rome). Approccio: usa offset locale del browser
-  const tzOffsetMin = d.getTimezoneOffset(); // minuti rispetto a UTC
+  const tzOffsetMin = d.getTimezoneOffset();
   const local = new Date(d.getTime() - tzOffsetMin * 60 * 1000);
   return local.toISOString().slice(0, 10); // YYYY-MM-DD
 }
@@ -97,7 +72,7 @@ async function loadBarName() {
 
 async function getNextOrderNumber() {
   const ref = doc(db, "config", "counters");
-  const next = await runTransaction(db, async (tx) => {
+  return await runTransaction(db, async (tx) => {
     const snap = await tx.get(ref);
     if (!snap.exists()) {
       tx.set(ref, { orderSeq: 1 });
@@ -108,23 +83,26 @@ async function getNextOrderNumber() {
       return curr + 1;
     }
   });
-  return next;
 }
 
-// ---------------- Load Categorie & Prodotti ----------------
-async function loadCategories() {
-  const snap = await getDocs(collection(db, "categories"));
-  categories = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(byOrder);
-  renderSettingsCategories();
-  renderProductSelects();
-  renderHome();
+// ---------------- Realtime Categories & Products ----------------
+function listenCategories() {
+  const qref = query(collection(db, "categories"));
+  onSnapshot(qref, snap => {
+    categories = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(byOrder);
+    renderSettingsCategories();
+    renderProductSelects();
+    renderHome();
+  });
 }
 
-async function loadProducts() {
-  const snap = await getDocs(collection(db, "products"));
-  products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderSettingsProducts();
-  renderHome();
+function listenProducts() {
+  const qref = query(collection(db, "products"));
+  onSnapshot(qref, snap => {
+    products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSettingsProducts();
+    renderHome();
+  });
 }
 
 function renderProductSelects() {
@@ -150,7 +128,6 @@ function renderHome() {
         const stockStr = (prod.stock === null || prod.stock === undefined) ? "" : ` [${prod.stock}]`;
         btn.textContent = `${prod.name}\n${EUR(prod.price)}${stockStr}`;
 
-        // Disabilita bottone se stock = 0
         if (prod.stock === 0) {
           btn.disabled = true;
           btn.style.opacity = "0.5";
@@ -167,52 +144,59 @@ function renderHome() {
   });
 }
 
+// Concurrency-safe add/remove with transaction
 async function addToCart(productId) {
   const prod = findProduct(productId);
   if (!prod) return;
+  try {
+    const ref = doc(db, "products", productId);
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error("Prodotto non trovato");
+      const data = snap.data();
+      if (data.stock !== null && data.stock !== undefined) {
+        if (data.stock <= 0) throw new Error("Prodotto esaurito");
+        tx.update(ref, { stock: data.stock - 1 });
+        prod.stock = data.stock - 1;
+      }
+    });
 
-  // Controlla stock
-  if (prod.stock !== null && prod.stock !== undefined && prod.stock <= 0) {
-    alert("Prodotto esaurito!");
-    return;
+    const existing = cart.find(i => i.productId === productId);
+    if (existing) existing.qty++;
+    else cart.push({ productId, name: prod.name, price: prod.price, qty: 1 });
+
+    renderCart();
+    renderHome();
+  } catch (err) {
+    alert(err.message);
   }
-
-  // Aggiunge al carrello
-  const existing = cart.find(i => i.productId === productId);
-  if (existing) existing.qty += 1;
-  else cart.push({ productId, name: prod.name, price: prod.price, qty: 1 });
-
-  // Decrementa stock subito
-  if (prod.stock !== null && prod.stock !== undefined) {
-    prod.stock -= 1; // aggiorna locale
-    const ref = doc(db, "products", prod.id);
-    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
-  }
-
-  renderCart();
-  renderHome(); // aggiorna bottoni con stock aggiornato
 }
 
 async function removeOneFromCart(productId) {
   const item = cart.find(i => i.productId === productId);
   if (!item) return;
 
-  // Incrementa lo stock locale e su Firebase
-  const prod = findProduct(productId);
-  if (prod && prod.stock !== null && prod.stock !== undefined) {
-    prod.stock += 1; // reintegra locale
-    const ref = doc(db, "products", prod.id);
-    await updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
-  }
+  try {
+    const prod = findProduct(productId);
+    const ref = doc(db, "products", productId);
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists()) throw new Error("Prodotto non trovato");
+      const data = snap.data();
+      if (data.stock !== null && data.stock !== undefined) {
+        tx.update(ref, { stock: data.stock + 1 });
+        prod.stock = data.stock + 1;
+      }
+    });
 
-  // Riduci quantità carrello
-  item.qty -= 1;
-  if (item.qty <= 0) {
-    cart = cart.filter(i => i.productId !== productId);
-  }
+    item.qty--;
+    if (item.qty <= 0) cart = cart.filter(i => i.productId !== productId);
 
-  renderCart();
-  renderHome(); // aggiorna bottoni con nuovo stock
+    renderCart();
+    renderHome();
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 function renderCart() {
@@ -558,7 +542,8 @@ exportBtn.addEventListener("click", () => {
 // ---------------- INIT ----------------
 (async function init() {
   await loadBarName();
-  await loadCategories();
-  await loadProducts();
+  listenCategories();
+  listenProducts();
   renderCart();
+  showPage("home");
 })();

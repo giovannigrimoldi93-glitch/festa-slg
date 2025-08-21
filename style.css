@@ -169,7 +169,6 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
   }
 }
 
-/* Schermi molto piccoli (max 480px, smartphone piccoli) */
 @media (max-width: 480px) {
   .product-btn {
     width: 100%;       /* bottoni uno sotto l’altro */
@@ -182,10 +181,12 @@ button.delete-cat:hover, button.delete-prod:hover { color: red; }
 
   #cart {
     font-size: 14px;
+    max-width: 100%;
+    margin-top: 15px;
   }
 
   /* NUOVO: il contenitore passa da "affiancato" a colonna */
   .home-container {
     flex-direction: column;
-  } 
+  }
 }

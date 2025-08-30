@@ -599,22 +599,28 @@ exportBtnPDF.addEventListener("click", () => {
   doc.save("storico.pdf");
 });
 
-exportBtnXSLX.addEventListener("click", () => {
-  const rows = [];
+// XLSX export
+exportBtnXLSX.addEventListener("click", () => {
+  // Prepara le righe della tabella
+  const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
-    const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+    const [productCell, quantityCell] = tr.querySelectorAll("td");
+    if (productCell && quantityCell) {
+      rows.push([productCell.innerText.trim(), quantityCell.innerText.trim()]);
+    }
   });
 
-  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
-  rows.push(["Totale €", tot.replace("€", "").trim()]);
+  // Aggiungi totale
+  const totText = historyTotalEl.textContent || "";
+  const totalValue = totText.replace("Totale: ", "").replace("€", "").trim();
+  rows.push(["Totale €", totalValue]);
 
   // Crea un workbook e un worksheet
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([["Prodotto", "Quantità"], ...rows]);
-
+  const ws = XLSX.utils.aoa_to_sheet(rows); // array di array → foglio Excel
   XLSX.utils.book_append_sheet(wb, ws, "Storico");
 
+  // Scarica il file XLSX
   XLSX.writeFile(wb, "storico.xlsx");
 });
 

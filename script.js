@@ -632,7 +632,7 @@ exportBtnXSLX.addEventListener("click", () => {
   const selectedDate = document.getElementById("history-date").value || new Date().toISOString().slice(0,10);
 
   // Nome file con data
-  XLSX.writeFile(workbook, `storico_${selectedDate}.xlsx`);
+  XLSX.writeFile(wb, `storico_${selectedDate}.xlsx`);
 });
 
 // ---------------- INIT ----------------

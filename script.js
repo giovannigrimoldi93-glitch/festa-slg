@@ -574,7 +574,13 @@ exportBtnCSV.addEventListener("click", () => {
 exportBtnPDF.addEventListener("click", () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  
+
+  // Leggo la data dall'input (se vuoto → oggi)
+  const selectedDate = document.getElementById("history-date").value || new Date().toISOString().slice(0,10);
+
+  // Titolo con data
+  doc.setFontSize(16);
+  doc.text(`Storico Prodotti - ${selectedDate}`, 14, 20);
   doc.setFontSize(16);
   doc.text("Storico Prodotti", 14, 20);
 
@@ -596,7 +602,8 @@ exportBtnPDF.addEventListener("click", () => {
     styles: { fontSize: 12 }
   });
 
-  doc.save("storico.pdf");
+ // Nome file con data
+  doc.save(`storico_${selectedDate}.pdf`);
 });
 
 // XLSX export

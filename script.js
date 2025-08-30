@@ -549,8 +549,8 @@ historyForm.addEventListener("submit", async (e) => {
   historyTotalEl.innerHTML = `<strong style="font-size:18px;">Totale: ${EUR(totalRevenue)}</strong>`;
 });
 
-// CSV export
-async function exportHistoryCSV() {
+// === EXPORT CSV (già funzionante) ===
+exportBtn.addEventListener("click", () => {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -568,13 +568,42 @@ async function exportHistoryCSV() {
   URL.revokeObjectURL(url);
 });
 
-async function exportHistoryXLSX() {
-  const rows = [["Prodotto", "Quantità"]];
 
-  totals.forEach((qty, name) => {
-    rows.push([name, qty]);
+// === EXPORT PDF ===
+function exportHistoryPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text("Storico ordini", 10, 10);
+
+  let y = 20;
+  document.querySelectorAll("#history-table tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length === 2) {
+      doc.setFontSize(12);
+      doc.text(`${tds[0].innerText}: ${tds[1].innerText}`, 10, y);
+      y += 8;
+    }
   });
-  rows.push(["Totale", EUR(totalRevenue)]);
+
+  const tot = (historyTotalEl.textContent || "").trim();
+  doc.setFontSize(14);
+  doc.text(tot, 10, y + 10);
+
+  doc.save("storico.pdf");
+}
+
+
+// === EXPORT XLSX ===
+function exportHistoryXLSX() {
+  const rows = [["Prodotto", "Quantità"]];
+  document.querySelectorAll("#history-table tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+  });
+  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
+  rows.push(["Totale €", tot.replace("€", "").trim()]);
 
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
   const workbook = XLSX.utils.book_new();
@@ -582,26 +611,7 @@ async function exportHistoryXLSX() {
 
   XLSX.writeFile(workbook, "storico.xlsx");
 }
-
-async function exportHistoryPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFontSize(16);
-  doc.text("Storico ordini - " + selectedDate, 10, 10);
-
-  let y = 20;
-  totals.forEach((qty, name) => {
-    doc.setFontSize(12);
-    doc.text(`${name}: ${qty}`, 10, y);
-    y += 8;
-  });
-
-  doc.setFontSize(14);
-  doc.text(`Totale: ${EUR(totalRevenue)}`, 10, y + 10);
-
-  doc.save("storico.pdf");
-}
+  
 
 // ---------------- INIT ----------------
 (async function init() {

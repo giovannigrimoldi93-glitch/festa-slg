@@ -601,28 +601,24 @@ exportBtnPDF.addEventListener("click", () => {
 
 // XLSX export
 exportBtnXSLX.addEventListener("click", () => {
-  const rows = [];
-
-  // Intestazioni fisse
-  const headers = ["Prodotto", "Quantità"];
-  rows.push(headers);
-
-  // Prendi i dati dalle righe
-  table.querySelectorAll("tr").forEach(tr => {
-    const cells = tr.querySelectorAll("td");
-    if (cells.length === headers.length) {
-      rows.push(Array.from(cells).map(td => td.innerText.trim()));
+  
+// Prepara le righe della tabella
+  const rows = [["Prodotto", "Quantità"]];
+  document.querySelectorAll("#history-table tr").forEach(tr => {
+    const [productCell, quantityCell] = tr.querySelectorAll("td");
+    if (productCell && quantityCell) {
+      rows.push([productCell.innerText.trim(), quantityCell.innerText.trim()]);
     }
   });
 
-  // Aggiungi totale come ultima riga
+  // Aggiungi totale
   const totText = historyTotalEl.textContent || "";
   const totalValue = totText.replace("Totale: ", "").replace("€", "").trim();
   rows.push(["Totale €", totalValue]);
 
-  // Crea workbook e worksheet
+  // Crea un workbook e un worksheet
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const ws = XLSX.utils.aoa_to_sheet(rows); // array di array → foglio Excel
   XLSX.utils.book_append_sheet(wb, ws, "Storico");
   
   // Scarica il file XLSX

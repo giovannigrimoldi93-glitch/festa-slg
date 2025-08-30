@@ -628,8 +628,11 @@ exportBtnXSLX.addEventListener("click", () => {
   const ws = XLSX.utils.aoa_to_sheet(rows); // array di array → foglio Excel
   XLSX.utils.book_append_sheet(wb, ws, "Storico");
   
-  // Scarica il file XLSX
-  XLSX.writeFile(wb, "storico.xlsx");
+ // Leggo la data dall'input (se vuoto → oggi)
+  const selectedDate = document.getElementById("history-date").value || new Date().toISOString().slice(0,10);
+
+  // Nome file con data
+  XLSX.writeFile(workbook, `storico_${selectedDate}.xlsx`);
 });
 
 // ---------------- INIT ----------------

@@ -549,8 +549,8 @@ historyForm.addEventListener("submit", async (e) => {
   historyTotalEl.innerHTML = `<strong style="font-size:18px;">Totale: ${EUR(totalRevenue)}</strong>`;
 });
 
-// === EXPORT CSV (già funzionante) ===
-exportBtn.addEventListener("click", () => {
+// === EXPORT CSV ===
+function exportHistoryCSV() {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -566,7 +566,7 @@ exportBtn.addEventListener("click", () => {
   a.download = "storico.csv";
   a.click();
   URL.revokeObjectURL(url);
-});
+}
 
 
 // === EXPORT PDF ===

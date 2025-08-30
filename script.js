@@ -550,7 +550,7 @@ historyForm.addEventListener("submit", async (e) => {
 });
 
 // === EXPORT CSV ===
-function exportHistoryCSV() {
+window.exportHistoryCSV = function() {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -570,7 +570,7 @@ function exportHistoryCSV() {
 
 
 // === EXPORT PDF ===
-function exportHistoryPDF() {
+window.exportHistoryPDF = function() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
@@ -596,7 +596,7 @@ function exportHistoryPDF() {
 
 
 // === EXPORT XLSX ===
-function exportHistoryXLSX() {
+window.exportHistoryXLSX = function() {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");

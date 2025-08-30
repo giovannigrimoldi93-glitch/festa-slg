@@ -549,8 +549,8 @@ historyForm.addEventListener("submit", async (e) => {
   historyTotalEl.innerHTML = `<strong style="font-size:18px;">Totale: ${EUR(totalRevenue)}</strong>`;
 });
 
-// === EXPORT CSV ===
-window.exportHistoryCSV = function() {
+// CSV export
+exportBtn.addEventListener("click", () => {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -566,32 +566,7 @@ window.exportHistoryCSV = function() {
   a.download = "storico.csv";
   a.click();
   URL.revokeObjectURL(url);
-}
-
-// === EXPORT PDF ===
-window.exportHistoryPDF = function() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  doc.setFontSize(16);
-  doc.text("Storico ordini", 10, 10);
-
-  let y = 20;
-  document.querySelectorAll("#history-table tr").forEach(tr => {
-    const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) {
-      doc.setFontSize(12);
-      doc.text(`${tds[0].innerText}: ${tds[1].innerText}`, 10, y);
-      y += 8;
-    }
-  });
-
-  const tot = (historyTotalEl.textContent || "").trim();
-  doc.setFontSize(14);
-  doc.text(tot, 10, y + 10);
-
-  doc.save("storico.pdf");
-}
+});
 
 // ---------------- INIT ----------------
 (async function init() {

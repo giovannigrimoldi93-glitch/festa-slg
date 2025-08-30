@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <title>San Luigi - Gestione Ordini</title>
   <link rel="stylesheet" href="style.css">
+  <!-- jsPDF e jsPDF-AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script type="module" src="script.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Favicon standard (desktop e tab browser) -->
@@ -111,6 +114,7 @@
     </table>
     <p id="history-total"><strong>Totale: €0.00</strong></p>
     <button id="export-csv">⬇️ Esporta CSV</button>
+    <button id="export-pdf">⬇️ Esporta PDF</button>
   </section>
 
   <!-- MODAL CATEGORIA -->

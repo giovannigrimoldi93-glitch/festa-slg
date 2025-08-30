@@ -43,6 +43,7 @@ const historyBody = document.getElementById("history-table");
 const historyTotalEl = document.getElementById("history-total");
 const exportBtnCSV = document.getElementById("export-csv");
 const exportBtnPDF = document.getElementById("export-pdf");
+const exportBtnXSLX = document.getElementById("export-xslx");
 
 // Modali
 const modalCategory = document.getElementById("modal-category");
@@ -569,7 +570,6 @@ exportBtnCSV.addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-// PDF export
 // PDF export con tabella formattata
 exportBtnPDF.addEventListener("click", () => {
   const { jsPDF } = window.jspdf;
@@ -578,18 +578,15 @@ exportBtnPDF.addEventListener("click", () => {
   doc.setFontSize(16);
   doc.text("Storico Prodotti", 14, 20);
 
-  // Prepara dati tabella
   const rows = [];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
     if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
   });
 
-  // Aggiungi totale
   const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
   rows.push(["Totale €", tot.replace("€", "").trim()]);
 
-  // Genera tabella con autoTable
   doc.autoTable({
     startY: 30,           // posizione verticale iniziale
     head: [["Prodotto", "Quantità"]], // intestazione
@@ -599,8 +596,26 @@ exportBtnPDF.addEventListener("click", () => {
     styles: { fontSize: 12 }
   });
 
-  // Scarica PDF
   doc.save("storico.pdf");
+});
+
+exportBtnXSLX.addEventListener("click", () => {
+  const rows = [];
+  document.querySelectorAll("#history-table tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+  });
+
+  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
+  rows.push(["Totale €", tot.replace("€", "").trim()]);
+
+  // Crea un workbook e un worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([["Prodotto", "Quantità"], ...rows]);
+
+  XLSX.utils.book_append_sheet(wb, ws, "Storico");
+
+  XLSX.writeFile(wb, "storico.xlsx");
 });
 
 // ---------------- INIT ----------------

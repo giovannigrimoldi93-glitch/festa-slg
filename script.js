@@ -41,7 +41,8 @@ const productCategorySelect = document.getElementById("product-category");
 const historyForm = document.getElementById("history-form");
 const historyBody = document.getElementById("history-table");
 const historyTotalEl = document.getElementById("history-total");
-const exportBtn = document.getElementById("export-csv");
+const exportBtnCSV = document.getElementById("export-csv");
+const exportBtnPDF = document.getElementById("export-pdf");
 
 // Modali
 const modalCategory = document.getElementById("modal-category");
@@ -550,7 +551,7 @@ historyForm.addEventListener("submit", async (e) => {
 });
 
 // CSV export
-exportBtn.addEventListener("click", () => {
+exportBtnCSV.addEventListener("click", () => {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -566,6 +567,40 @@ exportBtn.addEventListener("click", () => {
   a.download = "storico.csv";
   a.click();
   URL.revokeObjectURL(url);
+});
+
+// PDF export
+// PDF export con tabella formattata
+exportBtnPDF.addEventListener("click", () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  doc.setFontSize(16);
+  doc.text("Storico Prodotti", 14, 20);
+
+  // Prepara dati tabella
+  const rows = [];
+  document.querySelectorAll("#history-table tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+  });
+
+  // Aggiungi totale
+  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
+  rows.push(["Totale €", tot.replace("€", "").trim()]);
+
+  // Genera tabella con autoTable
+  doc.autoTable({
+    startY: 30,           // posizione verticale iniziale
+    head: [["Prodotto", "Quantità"]], // intestazione
+    body: rows,
+    theme: 'grid',         // stili possibili: 'striped', 'grid', 'plain'
+    headStyles: { fillColor: [41, 128, 185], textColor: 255 }, // colore intestazione
+    styles: { fontSize: 12 }
+  });
+
+  // Scarica PDF
+  doc.save("storico.pdf");
 });
 
 // ---------------- INIT ----------------

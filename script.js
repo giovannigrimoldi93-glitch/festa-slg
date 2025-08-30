@@ -600,7 +600,7 @@ exportBtnPDF.addEventListener("click", () => {
 });
 
 // XLSX export
-exportBtnXLSX.addEventListener("click", () => {
+exportBtnXSLX.addEventListener("click", () => {
   // Prepara le righe della tabella
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {

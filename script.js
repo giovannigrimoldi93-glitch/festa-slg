@@ -550,7 +550,7 @@ historyForm.addEventListener("submit", async (e) => {
 });
 
 // CSV export
-exportBtn.addEventListener("click", () => {
+async function exportHistoryCSV() {
   const rows = [["Prodotto", "Quantità"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -567,6 +567,41 @@ exportBtn.addEventListener("click", () => {
   a.click();
   URL.revokeObjectURL(url);
 });
+
+async function exportHistoryXLSX() {
+  const rows = [["Prodotto", "Quantità"]];
+
+  totals.forEach((qty, name) => {
+    rows.push([name, qty]);
+  });
+  rows.push(["Totale", EUR(totalRevenue)]);
+
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Storico");
+
+  XLSX.writeFile(workbook, "storico.xlsx");
+}
+
+async function exportHistoryPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text("Storico ordini - " + selectedDate, 10, 10);
+
+  let y = 20;
+  totals.forEach((qty, name) => {
+    doc.setFontSize(12);
+    doc.text(`${name}: ${qty}`, 10, y);
+    y += 8;
+  });
+
+  doc.setFontSize(14);
+  doc.text(`Totale: ${EUR(totalRevenue)}`, 10, y + 10);
+
+  doc.save("storico.pdf");
+}
 
 // ---------------- INIT ----------------
 (async function init() {

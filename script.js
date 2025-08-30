@@ -568,7 +568,6 @@ window.exportHistoryCSV = function() {
   URL.revokeObjectURL(url);
 }
 
-
 // === EXPORT PDF ===
 window.exportHistoryPDF = function() {
   const { jsPDF } = window.jspdf;
@@ -593,25 +592,6 @@ window.exportHistoryPDF = function() {
 
   doc.save("storico.pdf");
 }
-
-
-// === EXPORT XLSX ===
-window.exportHistoryXLSX = function() {
-  const rows = [["Prodotto", "Quantità"]];
-  document.querySelectorAll("#history-table tr").forEach(tr => {
-    const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
-  });
-  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
-  rows.push(["Totale €", tot.replace("€", "").trim()]);
-
-  const worksheet = XLSX.utils.aoa_to_sheet(rows);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Storico");
-
-  XLSX.writeFile(workbook, "storico.xlsx");
-}
-  
 
 // ---------------- INIT ----------------
 (async function init() {

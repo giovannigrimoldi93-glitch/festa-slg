@@ -16,14 +16,13 @@ Applicazione web per la gestione ordini del bar **San Luigi**, ottimizzata per u
   - Creazione/modifica/eliminazione categorie (nome, colore, ordine).
   - Creazione/modifica/eliminazione prodotti (nome, prezzo, stock, attivo).
   - Prodotti attivi/disattivi senza doverli eliminare.
-  - Nome del bar configurabile.
-  - Dati sincronizzati con **Firebase Firestore**.
+   - Dati sincronizzati con **Firebase Firestore**.
 
 - **Storico ordini**
   - Ricerca vendite per data.
   - Tabella con prodotti venduti e quantità.
   - Calcolo ricavi giornalieri.
-  - Esportazione risultati in **CSV**.
+  - Esportazione risultati in **CSV, PDF e XSLX**.
 
 ---
 

@@ -347,6 +347,27 @@ function openReceiptWindow({ orderNumber, now, items, total }) {
   w.close();
 }
 
+//---SVUOTA CARRELLO
+document.getElementById("clear-cart").addEventListener("click", () => {
+  if (cart.length === 0) return;
+
+  if (confirm("Vuoi davvero svuotare il carrello?")) {
+    // Reintegra lo stock se necessario
+    cart.forEach(item => {
+      const prod = findProduct(item.productId);
+      if (prod && prod.stock !== null && prod.stock !== undefined) {
+        prod.stock += item.qty; // reintegra locale
+        const ref = doc(db, "products", prod.id);
+        updateDoc(ref, { stock: prod.stock }); // aggiorna Firestore
+      }
+    });
+
+    cart = [];
+    renderCart();
+    renderHome();
+  }
+});
+
 // ---------------- IMPOSTAZIONI: Categorie ----------------
 document.getElementById("category-form").addEventListener("submit", async (e) => {
   e.preventDefault();

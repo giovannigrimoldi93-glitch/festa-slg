@@ -620,4 +620,4 @@ window.exportHistoryXLSX = function() {
   listenProducts();
   renderCart();
   showPage("home");
-})();
+}();

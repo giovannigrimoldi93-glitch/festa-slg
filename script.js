@@ -35,11 +35,16 @@ document.getElementById("login-btn").addEventListener("click", async () => {
 // Cambiamento stato utente
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // Utente loggato → mostra app, nascondi login
+    // Utente loggato
     document.getElementById("login-box").style.display = "none";
     document.getElementById("app").style.display = "block";
+
+    // 🔹 Qui faccio partire i listener di Firestore
+    listenCategories();
+    listenProducts();
+
   } else {
-    // Nessun utente loggato → mostra login
+    // Nessun utente loggato
     document.getElementById("login-box").style.display = "block";
     document.getElementById("app").style.display = "none";
   }

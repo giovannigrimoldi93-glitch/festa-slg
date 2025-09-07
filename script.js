@@ -16,6 +16,40 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const auth = getAuth(app);
+
+// Login
+document.getElementById("login-btn").addEventListener("click", async () => {
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (err) {
+    document.getElementById("login-error").textContent = "Errore: " + err.message;
+  }
+});
+
+// Cambiamento stato utente
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Utente loggato → mostra app, nascondi login
+    document.getElementById("login-box").style.display = "none";
+    document.getElementById("app").style.display = "block";
+  } else {
+    // Nessun utente loggato → mostra login
+    document.getElementById("login-box").style.display = "block";
+    document.getElementById("app").style.display = "none";
+  }
+});
+
+// Logout (se vuoi aggiungere un pulsante logout nella UI)
+function logout() {
+  signOut(auth);
+}
+
 // ---------------- NAV ----------------
 window.showPage = function(page) {
   document.querySelectorAll(".page").forEach(p => p.style.display = "none");

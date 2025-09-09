@@ -50,9 +50,18 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Logout (se vuoi aggiungere un pulsante logout nella UI)
-function logout() {
-  signOut(auth);
+// Logout  
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth)
+      .then(() => {
+        console.log("Utente disconnesso");
+      })
+      .catch((err) => {
+        console.error("Errore logout:", err);
+      });
+  });
 }
 
 // ---------------- NAV ----------------

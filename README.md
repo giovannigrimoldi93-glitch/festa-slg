@@ -8,7 +8,7 @@ Applicazione web per la gestione ordini del bar **San Luigi**, ottimizzata per u
 
 - **Home**
   - Pulsanti prodotti divisi per categorie (colori personalizzati).
-  - Carrello con totale e possibilità di rimuovere articoli.
+  - Carrello con totale, rimozione articoli e pulsante **"Svuota carrello"**.
   - Gestione **stock in tempo reale** con Firebase + transazioni sicure.
   - Pulsante **"Stampa e invia"**: stampa scontrino ottimizzato 80mm, numerato e con dicitura *"NON FISCALE"*.
 
@@ -16,13 +16,19 @@ Applicazione web per la gestione ordini del bar **San Luigi**, ottimizzata per u
   - Creazione/modifica/eliminazione categorie (nome, colore, ordine).
   - Creazione/modifica/eliminazione prodotti (nome, prezzo, stock, attivo).
   - Prodotti attivi/disattivi senza doverli eliminare.
-   - Dati sincronizzati con **Firebase Firestore**.
+  - Dati sincronizzati con **Firebase Firestore**.
 
 - **Storico ordini**
   - Ricerca vendite per data.
   - Tabella con prodotti venduti e quantità.
   - Calcolo ricavi giornalieri.
-  - Esportazione risultati in **CSV, PDF e XSLX**.
+  - Esportazione risultati in **CSV, PDF e XLSX** (con data inclusa nel file).
+
+- **Autenticazione**
+  - Login con **Firebase Authentication (email/password)**.
+  - Logout sempre disponibile nell’header accanto ai pulsanti di navigazione.
+  - Avviso visibile nel login:  
+    > ⚠️ *Accesso riservato al personale autorizzato. Inserire le credenziali fornite.*
 
 ---
 
@@ -30,51 +36,35 @@ Applicazione web per la gestione ordini del bar **San Luigi**, ottimizzata per u
 
 - **Frontend**: HTML, CSS, JavaScript (vanilla)
 - **Database**: [Firebase Firestore](https://firebase.google.com/)
+- **Autenticazione**: Firebase Authentication (Email/Password)
 - **Realtime**: listener con `onSnapshot`
 - **Transazioni**: `runTransaction` per la gestione sicura dello stock
 - **Stampa**: finestra dedicata ottimizzata per stampanti termiche 80mm
 
 ---
 
-## 🚀 Avvio
+## 🔑 Login
 
-1. Clona il repository su GitHub Pages o un hosting statico.
-2. Modifica il file `script.js` se devi aggiornare le credenziali Firebase.
-3. Apri `index.html` in un browser moderno (consigliato: Chrome).
-
----
-
-## 🖨️ Stampa Scontrini
-
-- Stampante termica **80mm**.
-- Contiene: logo, nome bar, numero ordine progressivo, data/ora, lista prodotti, totale, dicitura **"NON FISCALE"**.
-- Caratteri grandi per la leggibilità.
+1. Vai in **Firebase Console → Authentication → Utenti**.
+2. Aggiungi un nuovo utente con email e password (es. `admin@sanluigi.it` / `admin123`).
+3. Usa queste credenziali nel form di login.
+4. Dopo login:
+   - il form scompare,
+   - compare l’app completa con Home, Impostazioni, Storico,
+   - appare il pulsante 🚪 **Logout** nell’header.
 
 ---
 
-## 🔐 Note di sicurezza
+## 🔒 Sicurezza Firestore
 
-- L’app è pensata per **uso interno**.
-- Non è previsto un sistema di login pubblico.
-- L’URL non deve essere diffuso.
+Esempio di regole minime per consentire l’accesso solo a utenti autenticati:
 
----
-
-## 📂 Struttura file
-
-- `index.html` → struttura pagine (Home, Impostazioni, Storico).
-- `style.css` → grafica base e ottimizzazione pulsanti/carrello.
-- `script.js` → logica app, Firebase, transazioni, stampa, storico.
-- `README.md` → questo file.
-
----
-
-## 👨‍💻 Manutenzione
-
-- Aggiungere nuovi prodotti/categorie da **Impostazioni**.
-- Lo **stock** si aggiorna automaticamente quando si vende/rimuove un prodotto.
-- Gli **ordini** vengono salvati in Firestore e sono visibili nello storico.
-
----
-
-✍️ **Autore:** progetto interno per la gestione del Bar *San Luigi*.
+```js
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

@@ -59,7 +59,7 @@ if (logoutBtn) {
 
         // Aggiorna subito la UI
         document.getElementById("login-box").style.display = "block";
-        document.getElementById("app").style.display = "none";
+        document.getElementById("home").style.display = "none";
       })
       .catch((err) => {
         console.error("Errore logout:", err);

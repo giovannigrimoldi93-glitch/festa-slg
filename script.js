@@ -21,7 +21,7 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
 
 const auth = getAuth(app);
 
-// Login
+// --- LOGIN ---
 document.getElementById("login-btn").addEventListener("click", async () => {
   const email = document.getElementById("login-email").value;
   const password = document.getElementById("login-password").value;
@@ -32,31 +32,34 @@ document.getElementById("login-btn").addEventListener("click", async () => {
   }
 });
 
-// Cambiamento stato utente
+// --- CAMBIO STATO UTENTE ---
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // Utente loggato
+    // Utente loggato → mostra app, nascondi login
     document.getElementById("login-box").style.display = "none";
     document.getElementById("app").style.display = "block";
 
-    // 🔹 Qui faccio partire i listener di Firestore
+    // Avvia listener Firestore
     listenCategories();
     listenProducts();
-
   } else {
-    // Nessun utente loggato
+    // Nessun utente loggato → mostra login, nascondi app
     document.getElementById("login-box").style.display = "block";
     document.getElementById("app").style.display = "none";
   }
 });
 
-// Logout  
+// --- LOGOUT ---
 const logoutBtn = document.getElementById("logout-btn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
     signOut(auth)
       .then(() => {
         console.log("Utente disconnesso");
+
+        // Aggiorna subito la UI
+        document.getElementById("login-box").style.display = "block";
+        document.getElementById("app").style.display = "none";
       })
       .catch((err) => {
         console.error("Errore logout:", err);

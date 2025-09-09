@@ -238,3 +238,13 @@ header nav button {
 header nav button:hover {
   opacity: 0.9;
 }
+
+.login-info {
+  font-size: 14px;
+  color: #555;
+  background: #fff8e1;
+  border: 1px solid #f0c36d;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 10px;
+}

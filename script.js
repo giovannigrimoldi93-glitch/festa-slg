@@ -37,7 +37,7 @@ onAuthStateChanged(auth, (user) => {
   if (user) {
     // Utente loggato → mostra app, nascondi login
     document.getElementById("login-box").style.display = "none";
-    document.getElementById("home").style.display = "block";
+    document.getElementById("app").style.display = "block";
 
     // Avvia listener Firestore
     listenCategories();
@@ -45,7 +45,7 @@ onAuthStateChanged(auth, (user) => {
   } else {
     // Nessun utente loggato → mostra login, nascondi app
     document.getElementById("login-box").style.display = "block";
-    document.getElementById("home").style.display = "none";
+    document.getElementById("app").style.display = "none";
   }
 });
 
@@ -59,7 +59,7 @@ if (logoutBtn) {
 
         // Aggiorna subito la UI
         document.getElementById("login-box").style.display = "block";
-        document.getElementById("home").style.display = "none";
+        document.getElementById("app").style.display = "none";
       })
       .catch((err) => {
         console.error("Errore logout:", err);

@@ -1,6 +1,6 @@
 // ---------------- NETLIFY IDENTITY ----------------
 const netlifyIdentity = window.netlifyIdentity;
-netlifyIdentity.init();
+netlifyIdentity.init({ APIUrl: "https://festaslg.netlify.app/.netlify/identity" });
 
 function checkAuth() {
   const user = netlifyIdentity.currentUser();

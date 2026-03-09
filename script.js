@@ -1,52 +1,25 @@
-// ---------------- NETLIFY IDENTITY ----------------
-const netlifyIdentity = window.netlifyIdentity;
-netlifyIdentity.init({ APIUrl: "https://festaslg.netlify.app/.netlify/identity" });
-
-// Intercetta token di verifica/recovery nell'hash URL
-netlifyIdentity.on("init", user => {
-  if (!user) {
-    const hash = window.location.hash;
-    if (hash && (hash.includes("confirmation_token") || hash.includes("recovery_token") || hash.includes("invite_token"))) {
-      netlifyIdentity.open();
+// ---------------- API HELPERS (no login per test) ----------------
+async function apiFetch(path, options = {}) {
+  const res = await fetch(path, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
     }
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || "Errore API");
   }
-});
-
-netlifyIdentity.on("login", user => {
-  window.location.hash = "";
-  netlifyIdentity.close();
-  checkAuth();
-});
-
-netlifyIdentity.on("logout", () => { checkAuth(); });
-
-const logoutBtn = document.getElementById("logout-btn");
-if (logoutBtn) logoutBtn.addEventListener("click", () => netlifyIdentity.logout());
-
-document.getElementById("login-btn").addEventListener("click", () => {
-  netlifyIdentity.open("login");
-});
-
-async function getToken() {
-  const user = netlifyIdentity.currentUser();
-  if (!user) return null;
-  await user.jwt();
-  return user.token?.access_token || null;
+  return res.json();
 }
 
-function checkAuth() {
-  const user = netlifyIdentity.currentUser();
-  if (user) {
-    document.getElementById("login-box").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    initApp();
-  } else {
-    document.getElementById("login-box").style.display = "block";
-    document.getElementById("app").style.display = "none";
-  }
-}
-
-// ---------------- API HELPERS ----------------
+const api = {
+  get:    (path)       => apiFetch(path),
+  post:   (path, body) => apiFetch(path, { method: "POST",   body: JSON.stringify(body) }),
+  put:    (path, body) => apiFetch(path, { method: "PUT",    body: JSON.stringify(body) }),
+  delete: (path)       => apiFetch(path, { method: "DELETE" })
+};
 async function apiFetch(path, options = {}) {
   const token = await getToken();
   const res = await fetch(path, {
@@ -531,4 +504,7 @@ document.querySelectorAll(".modal").forEach(m => {
 });
 
 // ---------------- AVVIO ----------------
-checkAuth();
+// Avvio diretto (no login)
+document.getElementById("login-box").style.display = "none";
+document.getElementById("app").style.display = "block";
+initApp();

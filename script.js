@@ -429,7 +429,6 @@ document.getElementById("category-form").addEventListener("submit", async (e) =>
   if (!name) return alert("Inserisci un nome categoria");
   await addDoc(collection(db, "categories"), { name, color, order });
   e.target.reset();
-  await loadCategories();
 });
 
 function renderSettingsCategories() {
@@ -455,7 +454,6 @@ document.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!confirm("Eliminare la categoria? (I prodotti resteranno con riferimento alla categoria eliminata)")) return;
     await deleteDoc(doc(db, "categories", id));
-    await loadCategories();
   }
   // Categorie: modifica
   if (e.target.classList.contains("edit-cat")) {
@@ -489,7 +487,6 @@ document.getElementById("form-edit-category").addEventListener("submit", async (
   if (!payload.name) return alert("Nome categoria obbligatorio");
   await updateDoc(doc(db, "categories", id), payload);
   modalCategory.style.display = "none";
-  await loadCategories();
 });
 
 // ---------------- IMPOSTAZIONI: Prodotti ----------------
@@ -505,7 +502,6 @@ document.getElementById("product-form").addEventListener("submit", async (e) => 
   if (!name || isNaN(price)) return alert("Nome e prezzo sono obbligatori");
   await addDoc(collection(db, "products"), { name, price, stock, category, active });
   e.target.reset();
-  await loadProducts();
 });
 
 function renderSettingsProducts() {
@@ -543,7 +539,6 @@ document.addEventListener("click", async (e) => {
     const id = e.target.dataset.id;
     if (!confirm("Eliminare il prodotto?")) return;
     await deleteDoc(doc(db, "products", id));
-    await loadProducts();
   }
   // Prodotti: modifica
   if (e.target.classList.contains("edit-prod")) {
@@ -583,7 +578,6 @@ document.getElementById("form-edit-product").addEventListener("submit", async (e
   if (!name || isNaN(price)) return alert("Nome e prezzo sono obbligatori");
   await updateDoc(doc(db, "products", id), { name, price, stock, category, active });
   modalProduct.style.display = "none";
-  await loadProducts();
 });
 
 // Chiudi modali cliccando fuori
@@ -594,117 +588,166 @@ document.querySelectorAll(".modal").forEach(m => {
 });
 
 // ---------------- STORICO ----------------
+
+// Helpers date
+function todayStr() { return todayKeyInRome(new Date()); }
+function offsetDay(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return todayKeyInRome(d);
+}
+function firstDayOfMonth() {
+  const d = new Date();
+  d.setDate(1);
+  return todayKeyInRome(d);
+}
+
+// Preset rapidi
+document.getElementById("history-presets").addEventListener("click", (e) => {
+  const btn = e.target.closest(".preset-btn");
+  if (!btn) return;
+  const from = document.getElementById("history-date-from");
+  const to = document.getElementById("history-date-to");
+  const preset = btn.dataset.preset;
+  const today = todayStr();
+  if (preset === "today")     { from.value = today;              to.value = today; }
+  if (preset === "yesterday") { from.value = offsetDay(-1);      to.value = offsetDay(-1); }
+  if (preset === "week")      { from.value = offsetDay(-6);      to.value = today; }
+  if (preset === "month")     { from.value = firstDayOfMonth();  to.value = today; }
+  if (preset === "all")       { from.value = "2000-01-01";       to.value = today; }
+  // avvia ricerca automaticamente
+  loadHistory(from.value, to.value);
+});
+
+// Submit manuale
 historyForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const dateStr = document.getElementById("history-date").value; // YYYY-MM-DD
-  if (!dateStr) return;
+  const from = document.getElementById("history-date-from").value;
+  const to   = document.getElementById("history-date-to").value;
+  if (!from || !to) return;
+  if (from > to) return alert("La data 'Dal' deve essere precedente o uguale a 'Al'");
+  loadHistory(from, to);
+});
 
-  // query per dayKey
-  const qref = query(collection(db, "orders"), where("dayKey", "==", dateStr));
+// Funzione principale storico
+async function loadHistory(from, to) {
+  const qref = query(
+    collection(db, "orders"),
+    where("dayKey", ">=", from),
+    where("dayKey", "<=", to)
+  );
   const snap = await getDocs(qref);
 
-  // mappa prodotto -> qty totale e somma ricavi
-  const totals = new Map(); // name -> qty
+  // Aggrega dati: name -> { qty, revenue, price }
+  const totals = new Map();
   let totalRevenue = 0;
+  let totalOrders = snap.size;
 
   snap.forEach(d => {
     const data = d.data();
     (data.items || []).forEach(it => {
-      totals.set(it.name, (totals.get(it.name) || 0) + (it.qty || 1));
-      totalRevenue += (it.price || 0) * (it.qty || 1);
+      const prev = totals.get(it.name) || { qty: 0, revenue: 0, price: it.price || 0 };
+      const qty = it.qty || 1;
+      const rev = (it.price || 0) * qty;
+      totals.set(it.name, { qty: prev.qty + qty, revenue: prev.revenue + rev, price: it.price || 0 });
+      totalRevenue += rev;
     });
   });
 
-  // render tabella
+  // Prodotto più venduto
+  let topProduct = "—";
+  let topQty = 0;
+  totals.forEach((v, name) => { if (v.qty > topQty) { topQty = v.qty; topProduct = name; } });
+
+  // Riepilogo
+  const summary = document.getElementById("history-summary");
+  summary.style.display = "flex";
+  document.getElementById("summary-total").textContent = EUR(totalRevenue);
+  document.getElementById("summary-orders").textContent = totalOrders;
+  document.getElementById("summary-top").textContent = topProduct + (topQty > 0 ? ` (${topQty})` : "");
+
+  // Tabella
   historyBody.innerHTML = "";
-  [...totals.entries()].sort((a, b) => a[0].localeCompare(b[0], "it")).forEach(([name, qty]) => {
-    historyBody.insertAdjacentHTML("beforeend", `<tr><td>${name}</td><td>${qty}</td></tr>`);
-  });
-  historyTotalEl.innerHTML = `<strong style="font-size:18px;">Totale: ${EUR(totalRevenue)}</strong>`;
-});
+  [...totals.entries()]
+    .sort((a, b) => b[1].qty - a[1].qty) // ordina per qty decrescente
+    .forEach(([name, v]) => {
+      historyBody.insertAdjacentHTML("beforeend",
+        `<tr>
+          <td>${name}</td>
+          <td>${v.qty}</td>
+          <td>${EUR(v.revenue)}</td>
+        </tr>`
+      );
+    });
+
+  historyTotalEl.innerHTML = `<strong style="font-size:18px; color:#004aad;">Totale periodo: ${EUR(totalRevenue)}</strong>`;
+}
 
 // CSV export
 exportBtnCSV.addEventListener("click", () => {
-  const rows = [["Prodotto", "Quantità"]];
+  const rows = [["Prodotto", "Quantità", "Ricavo"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+    if (tds.length === 3) rows.push([tds[0].innerText, tds[1].innerText, tds[2].innerText]);
   });
-  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
-  rows.push(["Totale €", tot.replace("€", "").trim()]);
+  const tot = document.getElementById("summary-total").textContent || "€0.00";
+  rows.push(["TOTALE", "", tot]);
   const csv = rows.map(r => r.join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "storico.csv";
+  const from = document.getElementById("history-date-from").value || "nd";
+  const to   = document.getElementById("history-date-to").value   || "nd";
+  a.download = `storico_${from}_${to}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 });
 
-// PDF export con tabella formattata
+// PDF export
 exportBtnPDF.addEventListener("click", () => {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-
-  // Leggo la data dall'input (se vuoto → oggi)
-  const selectedDate = document.getElementById("history-date").value || new Date().toISOString().slice(0,10);
-
-  // Titolo con data
-  doc.setFontSize(16);
-  doc.text(`Storico Prodotti - ${selectedDate}`, 14, 20);
-  doc.setFontSize(16);
-  doc.text("Storico Prodotti", 14, 20);
+  const docPdf = new jsPDF();
+  const from = document.getElementById("history-date-from").value || "—";
+  const to   = document.getElementById("history-date-to").value   || "—";
+  docPdf.setFontSize(16);
+  docPdf.text(`Storico Ordini: ${from} → ${to}`, 14, 20);
 
   const rows = [];
   document.querySelectorAll("#history-table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
-    if (tds.length === 2) rows.push([tds[0].innerText, tds[1].innerText]);
+    if (tds.length === 3) rows.push([tds[0].innerText, tds[1].innerText, tds[2].innerText]);
   });
+  const tot = document.getElementById("summary-total").textContent || "€0.00";
+  rows.push(["TOTALE", "", tot]);
 
-  const tot = (historyTotalEl.textContent || "").replace("Totale: ", "");
-  rows.push(["Totale €", tot.replace("€", "").trim()]);
-
-  doc.autoTable({
-    startY: 30,           // posizione verticale iniziale
-    head: [["Prodotto", "Quantità"]], // intestazione
+  docPdf.autoTable({
+    startY: 30,
+    head: [["Prodotto", "Quantità", "Ricavo"]],
     body: rows,
-    theme: 'grid',         // stili possibili: 'striped', 'grid', 'plain'
-    headStyles: { fillColor: [41, 128, 185], textColor: 255 }, // colore intestazione
+    theme: "grid",
+    headStyles: { fillColor: [0, 74, 173], textColor: 255 },
     styles: { fontSize: 12 }
   });
-
- // Nome file con data
-  doc.save(`storico_${selectedDate}.pdf`);
+  docPdf.save(`storico_${from}_${to}.pdf`);
 });
 
 // XLSX export
 exportBtnXSLX.addEventListener("click", () => {
-  
-// Prepara le righe della tabella
-  const rows = [["Prodotto", "Quantità"]];
+  const from = document.getElementById("history-date-from").value || "nd";
+  const to   = document.getElementById("history-date-to").value   || "nd";
+  const rows = [["Prodotto", "Quantità", "Ricavo"]];
   document.querySelectorAll("#history-table tr").forEach(tr => {
-    const [productCell, quantityCell] = tr.querySelectorAll("td");
-    if (productCell && quantityCell) {
-      rows.push([productCell.innerText.trim(), quantityCell.innerText.trim()]);
-    }
+    const [c1, c2, c3] = tr.querySelectorAll("td");
+    if (c1 && c2 && c3) rows.push([c1.innerText.trim(), c2.innerText.trim(), c3.innerText.trim()]);
   });
+  const tot = document.getElementById("summary-total").textContent || "€0.00";
+  rows.push(["TOTALE", "", tot]);
 
-  // Aggiungi totale
-  const totText = historyTotalEl.textContent || "";
-  const totalValue = totText.replace("Totale: ", "").replace("€", "").trim();
-  rows.push(["Totale €", totalValue]);
-
-  // Crea un workbook e un worksheet
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows); // array di array → foglio Excel
+  const ws = XLSX.utils.aoa_to_sheet(rows);
   XLSX.utils.book_append_sheet(wb, ws, "Storico");
-  
- // Leggo la data dall'input (se vuoto → oggi)
-  const selectedDate = document.getElementById("history-date").value || new Date().toISOString().slice(0,10);
-
-  // Nome file con data
-  XLSX.writeFile(wb, `storico_${selectedDate}.xlsx`);
+  XLSX.writeFile(wb, `storico_${from}_${to}.xlsx`);
 });
 
 // ---------------- INIT ----------------

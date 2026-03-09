@@ -116,23 +116,58 @@
   <!-- STORICO -->
   <section id="history" class="page" style="display:none;">
     <h2>Storico Ordini</h2>
+
+    <!-- Preset rapidi -->
+    <div id="history-presets">
+      <button type="button" class="preset-btn" data-preset="today">Oggi</button>
+      <button type="button" class="preset-btn" data-preset="yesterday">Ieri</button>
+      <button type="button" class="preset-btn" data-preset="week">Ultimi 7 giorni</button>
+      <button type="button" class="preset-btn" data-preset="month">Questo mese</button>
+      <button type="button" class="preset-btn" data-preset="all">Tutto</button>
+    </div>
+
+    <!-- Range manuale -->
     <form id="history-form" class="form">
-      <input type="date" id="history-date" required>
-      <button type="submit">Vai!</button>
+      <label>Dal: <input type="date" id="history-date-from" required></label>
+      <label>Al: <input type="date" id="history-date-to" required></label>
+      <button type="submit">🔍 Cerca</button>
     </form>
+
+    <!-- Riepilogo incasso -->
+    <div id="history-summary" style="display:none;">
+      <div class="summary-card">
+        <span class="summary-label">💰 Incasso totale</span>
+        <span class="summary-value" id="summary-total">€0.00</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-label">📋 Ordini</span>
+        <span class="summary-value" id="summary-orders">0</span>
+      </div>
+      <div class="summary-card">
+        <span class="summary-label">🏆 Più venduto</span>
+        <span class="summary-value" id="summary-top">—</span>
+      </div>
+    </div>
+
+    <!-- Tabella risultati -->
     <table class="styled-table">
       <thead>
         <tr>
           <th>Prodotto</th>
           <th>Quantità</th>
+          <th>Ricavo</th>
         </tr>
       </thead>
       <tbody id="history-table"></tbody>
     </table>
     <p id="history-total"><strong>Totale: €0.00</strong></p>
-    <button id="export-csv">⬇️ Esporta CSV</button>
-    <button id="export-pdf">⬇️ Esporta PDF</button>
-    <button id="export-xslx">⬇️ Esporta Excel</button>
+
+    <!-- Export -->
+    <div id="history-export-btns">
+      <button id="export-csv">⬇️ CSV</button>
+      <button id="export-pdf">⬇️ PDF</button>
+      <button id="export-xslx">⬇️ Excel</button>
+    </div>
   </section>
 
   <!-- MODAL CATEGORIA -->

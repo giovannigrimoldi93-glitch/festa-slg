@@ -1,4 +1,43 @@
-// ---------------- API HELPERS (no login per test) ----------------
+// ---------------- NETLIFY IDENTITY ----------------
+const netlifyIdentity = window.netlifyIdentity;
+netlifyIdentity.init({ APIUrl: "https://festaslg.netlify.app/.netlify/identity" });
+
+netlifyIdentity.on("init", user => {
+  if (user) {
+    showApp();
+  } else {
+    const hash = window.location.hash;
+    if (hash && (hash.includes("confirmation_token") || hash.includes("invite_token") || hash.includes("recovery_token"))) {
+      netlifyIdentity.open();
+    }
+  }
+});
+
+netlifyIdentity.on("login", () => {
+  window.location.hash = "";
+  netlifyIdentity.close();
+  showApp();
+});
+
+netlifyIdentity.on("logout", () => {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-box").style.display = "block";
+});
+
+document.getElementById("login-btn").addEventListener("click", () => {
+  netlifyIdentity.open("login");
+});
+
+const logoutBtn = document.getElementById("logout-btn");
+if (logoutBtn) logoutBtn.addEventListener("click", () => netlifyIdentity.logout());
+
+function showApp() {
+  document.getElementById("login-box").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  initApp();
+}
+
+// ---------------- API HELPERS ----------------
 async function apiFetch(path, options = {}) {
   const res = await fetch(path, {
     ...options,

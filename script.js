@@ -518,9 +518,3 @@ exportBtnXSLX.addEventListener("click", () => {
 document.querySelectorAll(".modal").forEach(m => {
   m.addEventListener("click", e => { if (e.target.classList.contains("modal")) m.style.display = "none"; });
 });
-
-// ---------------- AVVIO ----------------
-// Avvio diretto (no login)
-document.getElementById("login-box").style.display = "none";
-document.getElementById("app").style.display = "block";
-initApp();

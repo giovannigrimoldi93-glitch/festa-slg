@@ -2,38 +2,22 @@
 const netlifyIdentity = window.netlifyIdentity;
 netlifyIdentity.init({ APIUrl: "https://festaslg.netlify.app/.netlify/identity" });
 
-function checkAuth() {
-  const user = netlifyIdentity.currentUser();
-  if (user) {
-    document.getElementById("login-box").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    initApp();
-  } else {
-    document.getElementById("login-box").style.display = "block";
-    document.getElementById("app").style.display = "none";
+// Intercetta token di verifica/recovery nell'hash URL
+netlifyIdentity.on("init", user => {
+  if (!user) {
+    const hash = window.location.hash;
+    if (hash && (hash.includes("confirmation_token") || hash.includes("recovery_token") || hash.includes("invite_token"))) {
+      netlifyIdentity.open();
+    }
   }
-}
-
-document.getElementById("login-btn").addEventListener("click", () => {
-  netlifyIdentity.open("login");
 });
 
-netlifyIdentity.on("login", () => {
+netlifyIdentity.on("login", user => {
+  // Pulisce l'hash dall'URL dopo il login
+  window.location.hash = "";
   netlifyIdentity.close();
   checkAuth();
 });
-
-netlifyIdentity.on("logout", () => { checkAuth(); });
-
-const logoutBtn = document.getElementById("logout-btn");
-if (logoutBtn) logoutBtn.addEventListener("click", () => netlifyIdentity.logout());
-
-async function getToken() {
-  const user = netlifyIdentity.currentUser();
-  if (!user) return null;
-  await user.jwt();
-  return user.token?.access_token || null;
-}
 
 // ---------------- API HELPERS ----------------
 async function apiFetch(path, options = {}) {
